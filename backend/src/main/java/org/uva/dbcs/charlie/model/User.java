@@ -1,4 +1,4 @@
-package org.uva.dbcs.charlie.practicacurso.model;
+package org.uva.dbcs.charlie.model;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;

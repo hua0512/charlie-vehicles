@@ -1,12 +1,12 @@
-package org.uva.dbcs.charlie.practicacurso.controllers;
+package org.uva.dbcs.charlie.controllers;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.uva.dbcs.charlie.practicacurso.model.User;
-import org.uva.dbcs.charlie.practicacurso.repo.UserRepository;
+import org.uva.dbcs.charlie.model.User;
+import org.uva.dbcs.charlie.repo.UserRepository;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
-package org.uva.dbcs.charlie.practicacurso.repo;
+package org.uva.dbcs.charlie.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.uva.dbcs.charlie.practicacurso.model.User;
+import org.uva.dbcs.charlie.model.User;
 
 import java.util.Optional;
 
