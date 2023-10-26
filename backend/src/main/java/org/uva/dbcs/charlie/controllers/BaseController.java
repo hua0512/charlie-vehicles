@@ -1,8 +1,11 @@
 package org.uva.dbcs.charlie.controllers;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
-public class BaseController<T extends JpaRepository<?, ?>> {
+
+@CrossOrigin(origins = "*")
+public abstract class BaseController<T extends JpaRepository<?, ?>> {
 
   protected final T repo;
 

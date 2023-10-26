@@ -20,8 +20,8 @@ public class ChargePoint implements Serializable {
 
   public ChargePoint(String address, double latitude, double longitude, VehiclePlugType plugType, VehiclePower power, VehicleStatus status) {
     this.address = address;
-    this.latitude = latitude;
-    this.longitude = longitude;
+    setLatitude(latitude);
+    setLongitude(longitude);
     this.plugType = plugType;
     this.power = power;
     this.status = status;
@@ -82,6 +82,10 @@ public class ChargePoint implements Serializable {
   }
 
   public void setLatitude(double latitude) {
+    // check if latitude is valid
+    if (latitude < -90 || latitude > 90) {
+      throw new IllegalArgumentException("Latitude must be between -90 and 90");
+    }
     this.latitude = latitude;
   }
 
@@ -90,6 +94,10 @@ public class ChargePoint implements Serializable {
   }
 
   public void setLongitude(double longitude) {
+    // check if longitude is valid
+    if (longitude < -180 || longitude > 180) {
+      throw new IllegalArgumentException("Longitude must be between -180 and 180");
+    }
     this.longitude = longitude;
   }
 

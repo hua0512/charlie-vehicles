@@ -6,21 +6,40 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.uva.dbcs.charlie.model.User;
+import org.uva.dbcs.charlie.model.Vehicle;
 import org.uva.dbcs.charlie.repo.UserRepository;
+import org.uva.dbcs.charlie.repo.VehicleRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")
 public class UserController extends BaseController<UserRepository> {
 
-  public UserController(UserRepository repo) {
+  private final VehicleRepository vRepo;
+
+  public UserController(UserRepository repo, VehicleRepository vRepo) {
     super(repo);
+    this.vRepo = vRepo;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<User> getAll() {
+  public List<User> getAll(@RequestParam(required = false) Map<String, String> params) {
+    // check if it has enabled param
+    if (!params.isEmpty()) {
+      if (params.containsKey("enable")) {
+        String enabled = params.get("enable");
+        // check if it is a boolean
+        if (enabled.equals("true") || enabled.equals("false")) {
+          return repo.findAllByEnabled(Boolean.parseBoolean(enabled));
+        } else {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enable param must be a boolean");
+        }
+      }
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid params");
+    }
     return repo.findAll();
   }
 
@@ -133,4 +152,11 @@ public class UserController extends BaseController<UserRepository> {
     // delete user
     repo.deleteById(id);
   }
+
+
+  @GetMapping(value = "/{id}/vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Vehicle> getVehiclesByUserId(@PathVariable long id) {
+    return vRepo.findAllByUserId_Id(id);
+  }
+
 }

@@ -53,7 +53,7 @@ public class Vehicle implements Serializable {
     this.userId = userId;
     this.brand = brand;
     this.model = model;
-    this.capacity = capacity;
+    setCapacity(capacity);
     this.plugType = plugType;
   }
 
@@ -94,6 +94,9 @@ public class Vehicle implements Serializable {
   }
 
   public void setCapacity(double capacity) {
+    if (capacity < 0) {
+      throw new IllegalArgumentException("Capacity cannot be negative");
+    }
     this.capacity = capacity;
   }
 
