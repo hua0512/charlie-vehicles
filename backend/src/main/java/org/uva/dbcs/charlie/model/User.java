@@ -1,5 +1,7 @@
 package org.uva.dbcs.charlie.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -7,12 +9,15 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "USER")
+@JsonIdentityInfo(generator =
+        ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class User implements Serializable {
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @Column(nullable = false, unique = true)
   private String name;
@@ -35,6 +40,12 @@ public class User implements Serializable {
   @UpdateTimestamp
   private Instant updatedAt;
 
+  @OneToMany(mappedBy = "userId",
+          fetch = FetchType.EAGER, cascade =
+          CascadeType.MERGE)
+  private List<Vehicle> vehicles;
+
+
   public User(String name, String firstName, String lastName, String email, String password, String paymentCard) {
     this.name = name;
     this.firstName = firstName;
@@ -42,6 +53,10 @@ public class User implements Serializable {
     this.email = email;
     this.password = password;
     this.paymentCard = paymentCard;
+  }
+
+  public User() {
+
   }
 
 
@@ -123,5 +138,9 @@ public class User implements Serializable {
 
   public Long getId() {
     return id;
+  }
+
+  public List<Vehicle> getVehicles() {
+    return vehicles;
   }
 }
