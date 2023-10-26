@@ -27,7 +27,7 @@ public class Vehicle implements Serializable {
   private User userId;
 
   @Column(nullable = false)
-  @Size(max = 10)
+  @Size(max = 20)
   private String brand;
 
   @Column(nullable = false)
