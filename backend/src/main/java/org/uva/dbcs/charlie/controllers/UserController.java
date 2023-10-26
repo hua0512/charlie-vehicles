@@ -13,12 +13,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")
-public class UserController {
-
-  private final UserRepository repo;
+public class UserController extends BaseController<UserRepository> {
 
   public UserController(UserRepository repo) {
-    this.repo = repo;
+    super(repo);
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -33,13 +31,13 @@ public class UserController {
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   public User createUser(@RequestBody @NotNull User user) {
-    // check if user already exists
-    if (repo.existsUserByName(user.getName())) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
-    }
 //     check if user is valid
     if (user.getName() == null || user.getName().isEmpty() || user.getName().length() > 30) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required and must be less than 30 characters");
+    }
+    // check if user already exists
+    if (repo.existsUserByName(user.getName())) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
     }
     if (user.getFirstName() == null || user.getFirstName().isEmpty() || user.getFirstName().length() > 30) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "First name is required and must be less than 30 characters");
@@ -50,6 +48,15 @@ public class UserController {
     if (user.getEmail() == null || user.getEmail().isEmpty() || user.getEmail().length() > 100) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required and must be less than 100 characters");
     }
+    // check if an email format is valid
+    if (!user.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email format is invalid");
+    }
+    // check if email is already taken
+    if (repo.existsUserByEmail(user.getEmail())) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already taken");
+    }
+
     if (user.getPassword() == null || user.getPassword().isEmpty() || user.getPassword().length() > 100) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required and must be less than 100 characters");
     }
@@ -83,13 +90,23 @@ public class UserController {
     User savedUser = repo.findById(id).get();
 
     // email, password and paymentCard can be modified
-    if (newUser.getEmail() != null && !newUser.getEmail().isEmpty() && !newUser.getEmail().equals(savedUser.getEmail()) && newUser.getEmail().length() <= 100) {
+    if (newUser.getEmail() != null && !newUser.getEmail().isEmpty() && !isSameContent(newUser.getEmail(), savedUser.getEmail()) && newUser.getEmail().length() <= 100) {
+
+      // check if an email format is valid
+      if (!newUser.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email format is invalid");
+      }
+
+      // check if email is already taken
+      if (repo.existsUserByEmail(newUser.getEmail())) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already taken");
+      }
       savedUser.setEmail(newUser.getEmail());
     }
-    if (newUser.getPassword() != null && !newUser.getPassword().isEmpty() && !newUser.getPassword().equals(savedUser.getPassword()) && newUser.getPassword().length() <= 100) {
+    if (newUser.getPassword() != null && !newUser.getPassword().isEmpty() && !isSameContent(newUser.getPassword(), savedUser.getPassword()) && newUser.getPassword().length() <= 100) {
       savedUser.setPassword(newUser.getPassword());
     }
-    if (newUser.getPaymentCard() != null && !newUser.getPaymentCard().isEmpty() && !newUser.getPaymentCard().equals(savedUser.getPaymentCard()) && newUser.getPaymentCard().length() <= 50) {
+    if (newUser.getPaymentCard() != null && !newUser.getPaymentCard().isEmpty() && !isSameContent(newUser.getPaymentCard(), savedUser.getPaymentCard()) && newUser.getPaymentCard().length() <= 50) {
       savedUser.setPaymentCard(newUser.getPaymentCard());
     }
 
