@@ -124,6 +124,6 @@ UNLOCK TABLES;
 # enable users with payment card and vehicle
 UPDATE user
 SET enabled = true
-WHERE payment_card IS NOT NULL AND EXISTS (
+WHERE payment_card IS NOT NULL AND payment_card <> '' AND EXISTS (
     SELECT 1 FROM vehicle WHERE vehicle.user_id = user.id
 );
