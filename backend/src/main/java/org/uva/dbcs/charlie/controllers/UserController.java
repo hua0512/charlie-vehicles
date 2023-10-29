@@ -131,7 +131,7 @@ public class UserController extends BaseController<UserRepository> {
 
     // check if paymentCard is not null or empty and user has at least one vehicle
     if (savedUser.getPaymentCard() != null && !savedUser.getPaymentCard().isEmpty()) {
-      if (savedUser.getVehicles() != null && !savedUser.getVehicles().isEmpty()) {
+      if (vRepo.countAllByUserId_Id(savedUser.getId()) > 0) {
         // enable user
         savedUser.setEnabled(true);
       }

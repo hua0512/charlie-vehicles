@@ -13,4 +13,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
   public boolean existsVehicleByCarRegistration(String carRegistration);
 
   List<Vehicle> findAllByUserId_Id(long id);
+
+  int countAllByUserId_Id(long id);
 }
