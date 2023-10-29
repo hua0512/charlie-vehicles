@@ -54,13 +54,24 @@ public class VehicleController extends BaseController<VehicleRepository> {
     if (vehicle.getModel() == null || vehicle.getModel().isEmpty() || vehicle.getModel().length() > 20) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Model is required and must be less than 20 characters");
     }
+
+    if (vehicle.getCapacity() < 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Capacity must be greater than 0");
+    }
+    if (vehicle.getPlugType() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plug type is required");
+    }
+
+    if (vehicle.getUserId() == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is required");
+    }
+
     // check if user exists
     if (!userRepo.existsById(vehicle.getUserId().getId())) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
     }
 
     Vehicle saved = repo.save(vehicle);
-
     // check if user is enabled and has a payment method
     changeUserStatus(vehicle.getUserId(), true);
 
