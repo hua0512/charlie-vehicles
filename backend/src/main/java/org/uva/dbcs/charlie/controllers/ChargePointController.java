@@ -27,15 +27,16 @@ public class ChargePointController extends BaseController<ChargePointRepository>
     return repo.save(chargePoint);
   }
 
-  @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ChargePoint updateChargePoint(ChargePoint chargePoint) {
-    if (chargePoint.getId() == 0) {
+  @PutMapping("/{id}")
+  @PatchMapping("/{id}")
+  public ChargePoint updateChargePoint(@PathVariable long id, ChargePoint chargePoint) {
+    if (id == 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charge point id is required");
     }
-    if (!repo.existsById(chargePoint.getId())) {
+    if (!repo.existsById(id)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charge point not found");
     }
-    ChargePoint saved = repo.findById(chargePoint.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charge point not found"));
+    ChargePoint saved = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charge point not found"));
 
     // only status can be updated
     if (chargePoint.getStatus() != null) {
