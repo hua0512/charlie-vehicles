@@ -13,22 +13,49 @@ import org.uva.dbcs.charlie.repo.VehicleRepository;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Restful service para usuarios.
+ * BASE URL : /users
+ *
+ * @author weiweng
+ * @author pabvela
+ * @author laublan
+ */
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")
 public class UserController extends BaseController<UserRepository> {
 
+  /**
+   * repositorio de vehiculos
+   */
   private final VehicleRepository vRepo;
 
+  /**
+   * Crea un controlador con parametros jpa.
+   *
+   * @param repo  interfaz jpa de usuario
+   * @param vRepo interfaz jpa de vehiculos
+   */
   public UserController(UserRepository repo, VehicleRepository vRepo) {
     super(repo);
     this.vRepo = vRepo;
   }
 
+  /**
+   * Devuelve todos los usuarios almacenados.
+   * <p>
+   * Devuelve por defecto todos los usuarios. Si el request contiene parametro "enable=true|false",
+   * devuelve la lista de usuarios activos o inactivos respectivamente.
+   *
+   * @param params mapa de parametros de request
+   * @return la lista de usuarios por defecto, o la lista con usuarios activos o inactivos.
+   */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public List<User> getAll(@RequestParam(required = false) Map<String, String> params) {
     // check if it has enabled param
     if (!params.isEmpty()) {
+      // ?enable=true|false
       if (params.containsKey("enable")) {
         String enabled = params.get("enable");
         // check if it is a boolean
@@ -43,11 +70,23 @@ public class UserController extends BaseController<UserRepository> {
     return repo.findAll();
   }
 
+  /**
+   * Obtiene un usuario con el id especificado.
+   *
+   * @param id id del usuario
+   * @return devuelve el usuario buscado.
+   */
   @GetMapping("/{id}")
   public User getUserById(@PathVariable long id) {
     return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
   }
 
+  /**
+   * Crea un usuario y lo guarda en la base de datos.
+   *
+   * @param user el usuario a crear
+   * @return el usuario creado.
+   */
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   public User createUser(@RequestBody @NotNull User user) {
 //     check if user is valid
@@ -90,23 +129,25 @@ public class UserController extends BaseController<UserRepository> {
   }
 
 
+  /**
+   * Modifica un usuario con el id especificado. Solo se podrá modificar el email, password y paymentCard.
+   * <b
+   * <p>
+   * Se activará el usuario si tiene un vehiculo y paymentCard asignado.
+   * </br>
+   *
+   * @param newUser el usuario a modificar
+   * @param id      el id del usuario a modificar
+   * @return el usuario modificado
+   */
   @PutMapping("/{id}")
-  public User updateUser(@RequestBody User newUser, @PathVariable long id) {
-
-    /**
-     * PUT /users/{id}: Modificará el usuario con el id especificado. Se podrá modificar el email, password y
-     * paymentCard. Hay que tener en cuenta que si un usuario tiene añadida la forma de pago y asociado al
-     * menos un vehículo, su estado pasará a activado (“enabled” a true). Si deja de tener forma de pago no puede
-     * seguir activo para la carga.
-     *
-     */
+  public User updateUser(@RequestBody @NotNull User newUser, @PathVariable long id) {
     // check if user exists
     if (!repo.existsById(id)) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
     }
     // get saved user
-    //noinspection OptionalGetWithoutIsPresent
-    User savedUser = repo.findById(id).get();
+    User savedUser = repo.getReferenceById(id);
 
     // email, password and paymentCard can be modified
     if (newUser.getEmail() != null && !newUser.getEmail().isEmpty() && !isSameContent(newUser.getEmail(), savedUser.getEmail()) && newUser.getEmail().length() <= 100) {
@@ -143,6 +184,11 @@ public class UserController extends BaseController<UserRepository> {
     return repo.save(savedUser);
   }
 
+  /**
+   * Elimina un usuario con el id especificado.
+   *
+   * @param id el id del usuario a eliminar
+   */
   @DeleteMapping("/{id}")
   public void deleteUser(@PathVariable long id) {
     // check if user exists
@@ -154,6 +200,12 @@ public class UserController extends BaseController<UserRepository> {
   }
 
 
+  /**
+   * Obtiene todos los vehiculos de un usuario especificado con el id.
+   *
+   * @param id el id del usuario a consultar.
+   * @return devuelve todos los vehiculos del usuario con id especificado.
+   */
   @GetMapping(value = "/{id}/vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Vehicle> getVehiclesByUserId(@PathVariable long id) {
     return vRepo.findAllByUserId_Id(id);

@@ -14,29 +14,71 @@ import org.uva.dbcs.charlie.repo.VehicleRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Restful service para vehículos.
+ * BASE URL : /vehicles
+ *
+ * @author weiweng
+ * @author pabvela
+ * @author laublan
+ */
 @RestController
 @RequestMapping("/vehicles")
 public class VehicleController extends BaseController<VehicleRepository> {
 
+  /**
+   * jpa repository de usuarios
+   */
   private final UserRepository userRepo;
+  /**
+   * jpa repository de puntos de carga
+   */
   private final ChargePointRepository cpRepo;
 
+  /**
+   * Crea un vehiclecontroller con los siguientes parametros.
+   *
+   * @param repo                  el jpa repository de vehiculos
+   * @param userRepo              jpa repository de usuarios.
+   * @param chargePointRepository jpa repository de puntos de carga.
+   */
   public VehicleController(VehicleRepository repo, UserRepository userRepo, ChargePointRepository chargePointRepository) {
     super(repo);
     this.userRepo = userRepo;
     this.cpRepo = chargePointRepository;
   }
 
+  /**
+   * Obtiene una lista con todos los vehiculos almacenado en la base de datos.
+   *
+   * @return la lista de vehiculos.
+   */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Vehicle> getAll() {
     return repo.findAll();
   }
 
+  /**
+   * Obtiene un vehiculo especificado con su id.
+   *
+   * @param id el id del vehiculo buscado.
+   * @return el vehiculo buscado
+   * @throws ResponseStatusException si no existe el vehiculo buscado.
+   */
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public Vehicle getVehicleById(@PathVariable long id) {
     return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
   }
 
+  /**
+   * Crea un vehiculo con la informacion especificada.
+   * <p>
+   * Actualiza el estado del usuario a activo si el usuario tiene un metodo de pago y tiene al menos un vehiculos.
+   *
+   * @param vehicle el vehiculo a crear
+   * @return el vehiculo creado.
+   * @throws ResponseStatusException si el vehiculo ya existe, o si el usuario no existe.
+   */
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   public Vehicle createVehicle(@RequestBody Vehicle vehicle) {
     // check if the vehicle is valid
@@ -72,35 +114,54 @@ public class VehicleController extends BaseController<VehicleRepository> {
     }
 
     Vehicle saved = repo.save(vehicle);
-    // check if user is enabled and has a payment method
-    changeUserStatus(vehicle.getUserId(), true);
+    User savedUser = userRepo.getReferenceById(vehicle.getUserId().getId());
+    // check if user is not enabled and has a payment method
+    if (!savedUser.isEnabled() && savedUser.getPaymentCard() != null && !savedUser.getPaymentCard().isEmpty()) {
+      changeUserStatus(savedUser, true);
+    }
 
     return saved;
   }
 
+  /**
+   * Cambia el estado de un usuario.
+   *
+   * @param user    el usuario a cambiar el estado
+   * @param enabled el estado a cambiar
+   */
+
   private void changeUserStatus(User user, boolean enabled) {
     // check if user is enabled and has a payment method
-    if (user.isEnabled() && user.getPaymentCard() != null && !user.getPaymentCard().isEmpty()) {
-      User savedUser = userRepo.getReferenceById(user.getId());
-      savedUser.setEnabled(enabled);
-      userRepo.save(savedUser);
-    }
+    user.setEnabled(enabled);
+    userRepo.save(user);
   }
 
 
+  /**
+   * Elimina un vehiculo con el id especificado.
+   * @param id el id del vehiculo a eliminar
+   */
   @DeleteMapping("/{id}")
   public void deleteVehicle(@PathVariable long id) {
     Vehicle vehicle = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
     if (repo.findAllByUserId_Id(vehicle.getUserId().getId()).size() == 1) {
-      changeUserStatus(vehicle.getUserId(), false);
+      User savedUser =  userRepo.getReferenceById(vehicle.getUserId().getId());
+      changeUserStatus(savedUser, false);
     }
     repo.deleteById(id);
   }
 
-  @GetMapping(value = "/{id}/chargepoints", produces = MediaType.APPLICATION_JSON_VALUE)
+  /**
+   * Obtiene una lista de puntos de carga compatibles con el vehiculo especificado(ID).
+   * @param id el id del vehiculo a consultar
+   * @return lista de puntos de carga compatibles
+   */
+  @GetMapping(value = "/{id}/chargerpoints", produces = MediaType.APPLICATION_JSON_VALUE)
   public List<ChargePoint> getCompatibleChargePoints(@PathVariable long id) {
     Vehicle vehicle = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
+    // check if vehicle has plug type
     if (vehicle.getPlugType() != null) {
+      // lista de puntos de carga compatibles
       return cpRepo.findAllByPlugType(vehicle.getPlugType()).orElse(new ArrayList<>());
     } else {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vehicle plug type is required");
