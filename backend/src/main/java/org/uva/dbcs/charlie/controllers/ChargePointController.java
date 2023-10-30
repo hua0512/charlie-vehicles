@@ -10,7 +10,7 @@ import org.uva.dbcs.charlie.repo.ChargePointRepository;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chargepoints")
+@RequestMapping("/chargerpoints")
 public class ChargePointController extends BaseController<ChargePointRepository> {
 
   public ChargePointController(ChargePointRepository repository) {
