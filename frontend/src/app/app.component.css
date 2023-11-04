@@ -1,0 +1,20 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /*border: solid 3px yellow; !* for debugging purposes *!*/
+}
+
+body, h1, h2, h3, p, div, span, button, input {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
