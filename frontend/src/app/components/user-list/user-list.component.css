@@ -1,72 +1,36 @@
-.example-container {
+mat-card {
+  margin: 20px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  display: block;
   position: relative;
-  background-color: #f3f5f9;
-}
-
-.example-table-container {
-  min-height: 200px;
-  overflow: auto;
-  border-radius: 12px;
-  padding : 20px;
-  margin-top: 40px;
-  margin-inline: 40px;
-  margin-bottom: 80px;
-  background-color: white;
+  word-wrap: break-word;
 }
 
 mat-paginator {
-  margin-bottom: 100px;
-  height: 50px;
-}
-mat-table {
-  overflow: auto;
+  padding-bottom: 50px;
 }
 
-.user-top-layout{
-  background-color: white;
-  padding-block: 20px;
-  padding-inline: 40px;
-}
-
-.full-width-table {
-  width: 100%;
-}
-
-.fab-button{
+.fab-button {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 2;
 }
 
-.example-loading-shade {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 56px;
-  right: 0;
-  background: rgba(0, 0, 0, 0.15);
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.example-loading-shade mat-spinner {
-  width: 100px;
-  height: 100px;
-
-}
-
-.example-rate-limit-reached {
-  max-width: 360px;
-  text-align: center;
-}
-
-
+/*table columns section*/
 .mat-column-id,
 .mat-column-status {
   width: min-content;
+  flex: 0 0 100px;
+}
+
+.mat-column-name,
+.mat-column-createdAt,
+.mat-column-updatedAt{
+  width: min-content;
+  flex: 0 0 180px;
 }
 
 .mat-column-email,
@@ -75,47 +39,31 @@ mat-table {
   word-break: break-all;
 }
 
-.mat-column-select {
-  overflow: initial;
-}
-
-.status-success {
-  background-color: #e8f7f2;
-  color: #1bac84;
-  border-radius: 6px;
-  padding: 5px 8px;
-  width: min-content;
-}
-
-.status-failed {
-  background-color: #fff5e8;
-  color: #fea235;
-  border-radius: 6px;
-  padding: 5px 8px;
-  width: min-content;
+.mat-column-actions {
+  flex: 2;
 }
 
 
 /*actions section*/
 #actions_container {
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 10px;
 }
 
-.ic_edit, .ic_delete {
-  background-color: transparent;
-  border: none;
-  border-radius: 12px;
-  padding: 5px;
+.ic_action {
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding-top: 5px;
 }
 
-.ic_edit:hover, .ic_delete:hover {
-  background-color: #f5f5f5;
-}
-
-.action_img {
-  width: 24px;
-  height: 24px;
+#actions_container svg {
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
 }
 
 .table-search-container {
@@ -125,10 +73,10 @@ mat-table {
   margin-bottom: 20px;
 }
 
-
+/*search section*/
 .search-bar {
   display: flex;
-  width: 70%;
+  width: 50%;
   align-items: center;
   padding: 0 20px;
   border: 1px solid #ccc;
@@ -140,9 +88,11 @@ mat-table {
   padding: 10px 20px;
   border: none;
 }
+
 .search-bar input::placeholder {
-  color: #ccc;
+  color: rgba(0, 0, 0, 0.6);
 }
+
 .search-bar input:focus {
   border: none;
   outline: none;
@@ -150,5 +100,5 @@ mat-table {
 
 .search-bar mat-icon {
   position: relative;
-  color: #ccc;
+  color: rgba(0, 0, 0, 0.6);
 }

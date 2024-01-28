@@ -1,0 +1,110 @@
+<div class="profile_container">
+  <mat-card>
+    <mat-card-title>
+      <h2>Detalles del usuario</h2>
+    </mat-card-title>
+    <mat-card-subtitle>
+      <mat-spinner *ngIf="loading"></mat-spinner>
+    </mat-card-subtitle>
+    <mat-card-content>
+      <div class="left-container">
+        <form ngForm [formGroup]="myForm" (ngSubmit)="onSubmit()">
+          <div *ngIf="!!id">
+            <mat-form-field hideRequiredMarker="true">
+              <mat-label># Id del usuario</mat-label>
+              <input class="input-no-editable" formControlName="id" matInput [readonly]="true" type="text">
+            </mat-form-field>
+          </div>
+
+          <mat-form-field hideRequiredMarker="{{!!id}}}" [hintLabel]="getHintLabel(10)">
+            <mat-label>Apodo</mat-label>
+            <input class="input-no-editable" formControlName="name" matInput [readonly]="!!id" maxlength="10"
+                   type="text" placeholder="Introduzca un apodo..." #name>
+            <mat-hint align="end">{{ name.value.length }}/10</mat-hint>
+            <mat-error *ngIf="myForm.invalid">El apodo debe tener entre 6 y 10 caracteres</mat-error>
+          </mat-form-field>
+
+          <mat-form-field hideRequiredMarker="!!id" [hintLabel]="getHintLabel(30)">
+            <mat-label>Nombre</mat-label>
+            <input class="input-no-editable" formControlName="firstName" matInput [readonly]="!!id" maxlength="30"
+                   type="text" placeholder="Introduzca su nombre..." #firstname>
+
+            <mat-hint align="end">{{ firstname.value.length }}/30</mat-hint>
+            <mat-error *ngIf="myForm.invalid">El nombre debe tener entre 3 y 30 caracteres</mat-error>
+          </mat-form-field>
+
+          <mat-form-field hideRequiredMarker="!!id" [hintLabel]="getHintLabel(30)">
+            <mat-label>Apellido</mat-label>
+            <input class="input-no-editable" formControlName="lastName" matInput [readonly]="!!id" maxlength="30"
+                   type="text" placeholder="Introduzca sus apellidos..." #lastname>
+            <mat-hint align="end">{{ lastname.value.length }}/30</mat-hint>
+            <mat-error *ngIf="myForm.invalid">El apellido debe tener entre 3 y 30 caracteres</mat-error>
+          </mat-form-field>
+          <br>
+          <mat-form-field hintLabel="Max 50 caracteres" appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput [type]="'email'" id="email" maxlength="50" formControlName="email" #email
+                   placeholder="pet@example.com">
+            <mat-hint align="end">{{ email.value.length }}/50</mat-hint>
+            <mat-error *ngIf="myForm.invalid">Se debe introducir un email válido</mat-error>
+          </mat-form-field>
+          <br>
+          <mat-form-field appearance="outline" hintLabel="Max 50 caracteres">
+            <mat-label>Password</mat-label>
+            <input matInput [type]="hide ? 'password' : 'text'" maxlength="50" formControlName="password" #password
+                   placeholder="Introduce tu contraseña...">
+            <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+                    [attr.aria-pressed]="hide">
+              <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-hint align="end">{{ password.value.length }}/50</mat-hint>
+            <mat-error *ngIf="myForm.invalid">La contraseña debe tener entre 8 y 50 caracteres</mat-error>
+          </mat-form-field>
+          <br>
+          <mat-form-field appearance="outline" hintLabel="Max 16 caracteres">
+            <mat-label>Payment card</mat-label>
+            <input matInput [type]="hidePayment ? 'password' : 'text'" maxlength="16" formControlName="paymentCard"
+                   placeholder="Introduce el número de tarjeta..." #paymentcard>
+            <button type="button" mat-icon-button matSuffix (click)="hidePayment = !hidePayment"
+                    [attr.aria-label]="'Hide payment card'"
+                    [attr.aria-pressed]="hidePayment">
+              <mat-icon>{{ hidePayment ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-hint align="end">{{ paymentcard.value.length }}/16</mat-hint>
+            <mat-error *ngIf="myForm.invalid">Introduzca una tarjeta válida</mat-error>
+          </mat-form-field>
+          <br>
+
+          <mat-form-field hideRequiredMarker="!!id" *ngIf="!!id">
+            <mat-label>Fecha de creación</mat-label>
+            <input class="input-no-editable" formControlName="createdAt" matInput [readonly]="!!id" type="text">
+          </mat-form-field>
+
+          <mat-form-field hideRequiredMarker="!!id" *ngIf="!!id">
+            <mat-label>Fecha de modificación</mat-label>
+            <input class="input-no-editable" formControlName="updatedAt" matInput [readonly]="!!id" type="text">
+          </mat-form-field>
+
+          <mat-divider></mat-divider>
+          <div *ngIf="!!id">
+            <h4>Estado</h4>
+            <app-user-status-component [status]="user.enabled"></app-user-status-component>
+          </div>
+          <mat-divider></mat-divider>
+
+          <br>
+          <div class="user-buttons">
+            <button type="submit" id="submit_button" mat-raised-button color="primary" [disabled]="!myForm.valid">Enviar
+            </button>
+            <br>
+            <button type="button" id="cancel_button" mat-raised-button color="warn" [routerLink]="['/users']">Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+</div>
+

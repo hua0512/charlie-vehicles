@@ -196,7 +196,12 @@ public class UserController extends BaseController<UserRepository> {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
     }
     // delete user
-    repo.deleteById(id);
+    try {
+      vRepo.deleteAll(vRepo.findAllByUserId_Id(id));
+      repo.deleteById(id);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error deleting user");
+    }
   }
 
 

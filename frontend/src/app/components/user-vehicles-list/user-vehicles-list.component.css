@@ -1,0 +1,50 @@
+.vehicles-container {
+  margin: 0 auto;
+  width: 70%;
+  height: 80%;
+}
+
+.vehicles-out-card {
+  margin: 20px;
+  padding: 20px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  display: block;
+  position: relative;
+  min-width: 0;
+  word-wrap: break-word;
+}
+
+.vehicles-card {
+  min-width: 0;
+  word-wrap: break-word;
+  overflow: auto;
+}
+
+
+.card-item{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 5px 0;
+}
+
+.card-item svg{
+  max-width: 18px;
+  max-height: 18px;
+}
+.card-item-value{
+  font-weight: 500;
+}
+
+.fab-button{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2;
+}
+
+mat-grid-tile{
+  padding: 10px;
+}

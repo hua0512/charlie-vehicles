@@ -1,0 +1,19 @@
+.status-success {
+  background-color: #e8f7f2;
+  color: #1bac84;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  width: 8rem;
+  max-width: 8rem;
+}
+
+.status-failed {
+  background-color: #fff5e8;
+  color: #fea235;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  width: 8rem;
+  max-width: 8rem;
+}

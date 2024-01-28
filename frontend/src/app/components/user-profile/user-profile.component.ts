@@ -1,16 +1,43 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {UserService} from "../../services/UserService";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {User} from "../../models/user.model";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatListModule} from "@angular/material/list";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatInputModule} from "@angular/material/input";
+import {MatButtonModule} from "@angular/material/button";
+import {MatIconModule} from "@angular/material/icon";
+import {DatePipe, NgIf} from "@angular/common";
+import {MatCard, MatCardContent, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
+import {UserStatusComponentComponent} from "../user-status-component/user-status-component.component";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-user-edit',
-  templateUrl: './user-edit.component.html',
-  styleUrls: ['./user-edit.component.css']
+  templateUrl: './user-profile.component.html',
+  styleUrls: ['./user-profile.component.css'],
+  imports: [
+    MatListModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    DatePipe,
+    RouterLink,
+    NgIf,
+    MatCard,
+    MatCardContent,
+    MatCardSubtitle,
+    MatCardTitle,
+    UserStatusComponentComponent,
+    MatProgressSpinner,
+  ],
+  standalone: true
 })
-export class UserEditComponent implements OnInit, AfterViewInit {
+export class UserProfileComponent implements OnInit, AfterViewInit {
 
   myForm: FormGroup = new FormGroup({});
   operation!: string;
@@ -30,15 +57,18 @@ export class UserEditComponent implements OnInit, AfterViewInit {
 
   hide = true;
   hidePayment = true;
+  loading: boolean = false;
 
   constructor(private fb: FormBuilder, private userService: UserService, private ruta: ActivatedRoute, private router: Router, private _snackBar: MatSnackBar) {
 
   }
 
+
   // Inicializa el formulario
   private _initForm() {
     this.myForm = this.fb.group({
-      name: [this.user.name, [Validators.required, Validators.minLength(4)]],
+      id: [this.user.id],
+      name: [this.user.name, [Validators.required, Validators.minLength(6)]],
       firstName: [this.user.firstName, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
       lastName:
         [this.user.lastName, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
@@ -46,12 +76,15 @@ export class UserEditComponent implements OnInit, AfterViewInit {
         [this.user.password, [Validators.required, Validators.minLength(6), Validators.maxLength(50)]],
       email:
         [this.user.email, [Validators.required, Validators.email, Validators.maxLength(100)]],
-      paymentCard: [this.user.paymentCard],
+      // add a validator to check paymentcard format
+      paymentCard: [this.user.paymentCard, [Validators.maxLength(16), Validators.minLength(16), Validators.pattern("^[0-9]*$")]],
+      createdAt: [this.getDate(this.user.createdAt)],
+      updatedAt: [this.getDate(this.user.updatedAt)]
     })
   }
 
   ngOnInit() {
-   this._initForm();
+    this._initForm();
     this.operation = this.ruta.snapshot.url[this.ruta.snapshot.url.length - 1].path;
     // estamos en editar
     if (this.operation == "edit") {
@@ -63,12 +96,14 @@ export class UserEditComponent implements OnInit, AfterViewInit {
           error: (err) => console.log("Error al leer id para editar: " + err)
         }
       )
+      this.loading = true;
       this.userService.getUser(this.id).subscribe(
         {
           next: (user) => {
             this.user = user;
             console.log("User: " + JSON.stringify(this.user));
             this._initForm();
+            this.loading = false;
           },
           error: (err) => console.log("Error: " + err)
         },
@@ -88,17 +123,25 @@ export class UserEditComponent implements OnInit, AfterViewInit {
         updatedAt: ''
       };
     }
+    this.myForm.get('email')?.statusChanges.subscribe((status) => {
+      // check if email is valid
+      if (status == "VALID") {
+        // TODO : call api to check if email is already in use
+        console.log("Email valido");
+      }
+    });
   }
 
   ngAfterViewInit(): void {
+
   }
+
+  private hasChanged : boolean = false;
 
   onSubmit() {
     console.log("Enviado formulario");
-    console.log(this.myForm.value);
-  }
+    console.warn(this.myForm.value);
 
-  onUpdated() {
     // obtenemos datos del formulario
     // solo actualizamos los campos que se han modificado
     // solo se puede modificar email, contraseña y tarjeta de pago
@@ -114,43 +157,76 @@ export class UserEditComponent implements OnInit, AfterViewInit {
       this.user.password = formPassword
       this.user.email = formEmail;
       this.user.paymentCard = formPayment;
+      this.loading = true;
       this.userService.postUser(this.user).subscribe(
         {
           next: (user) => {
             console.log("User created: " + JSON.stringify(user));
             this.router.navigate(['/users']).then(r => console.log("Navegando a /users"));
+            this.loading = false;
           },
-          error: (err) => this._snackBar.open("Error al crear usuario: " + err.message, "Cerrar", {duration: 3000})
+          error: (err) => {
+            this._snackBar.open("Error al crear usuario: " + err, "Cerrar", {duration: 3000});
+            this.loading = false;
+          }
         }
       )
       return;
     }
 
-    let hasChanged = false;
     if (formPassword != this.user.password) {
       this.user.password = formPassword;
-      hasChanged = true;
+      this.hasChanged = true;
     }
     if (formEmail != this.user.email) {
       this.user.email = formEmail;
-      hasChanged = true;
+      this.hasChanged = true;
     }
     if (formPayment != this.user.paymentCard) {
       this.user.paymentCard = formPayment;
-      hasChanged = true;
+      this.hasChanged = true;
     }
-    if (hasChanged) {
+    if (this.hasChanged) {
+      this.loading = true;
       this.userService.putUser(this.user).subscribe(
         {
           next: (user) => {
             console.log("User updated: " + JSON.stringify(user));
             this.router.navigate(['/users']).then(r => console.log("Navegando a /users"));
+            let msg = "Se ha creado el usuario correctamente";
+            if (this.id) {
+              msg = "Usuario " + this.id + " actualizado correctamente";
+            }
+            this._snackBar.open(msg, "Cerrar", {duration: 3000});
+            this.loading = false;
           },
-          error: (err) => this._snackBar.open("Error al actualizar usuario: " + err.message, "Cerrar", {duration: 3000})
+          error: (err) => {
+            this._snackBar.open("Error al actualizar usuario: " + err, "Cerrar", {
+              duration: 3000,
+              verticalPosition: "top"
+            });
+            this.loading = false;
+          }
         }
       )
     } else {
       this._snackBar.open("No se ha modificado ningún campo", "Cerrar", {duration: 3000});
     }
+  }
+
+  /**
+   * Returns a formatted date.
+   * @param isoDate The date in ISO 8601 format.
+   */
+  protected getDate(isoDate: string | undefined) {
+    if (!isoDate) {
+      return '';
+    }
+    // createdAt is a string in format ISO 8601
+    return new Date(isoDate).toLocaleString('es-ES', {hour12: false});
+  }
+
+  getHintLabel(number: number) {
+    return this.id ? 'No modificable' : 'Máximo ' + number + ' caracteres'
   }
 }

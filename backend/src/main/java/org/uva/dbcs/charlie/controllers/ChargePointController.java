@@ -42,7 +42,7 @@ public class ChargePointController extends BaseController<ChargePointRepository>
    * @return el punto de carga creado.
    */
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ChargePoint createChargePoint(ChargePoint chargePoint) {
+  public ChargePoint createChargePoint(@RequestBody ChargePoint chargePoint) {
     if (chargePoint == null)
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charge point information not provided");
     return repo.save(chargePoint);
@@ -51,8 +51,9 @@ public class ChargePointController extends BaseController<ChargePointRepository>
   /**
    * Actualiza un punto de carga.
    * Solo se puede actualizar el estado!
-   * @param id el id del punto de carga a actualizar
-   * @param chargePoint  punto de carga a actualizar
+   *
+   * @param id          el id del punto de carga a actualizar
+   * @param chargePoint punto de carga a actualizar
    * @return el punto de carga actualizado
    */
   @PutMapping("/{id}")
@@ -65,7 +66,7 @@ public class ChargePointController extends BaseController<ChargePointRepository>
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charge point not found");
     }
 
-    if (chargePoint == null) throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charge point info is null");
+    if (chargePoint == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charge point info is null");
     ChargePoint saved = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Charge point not found"));
 
     // only status can be updated

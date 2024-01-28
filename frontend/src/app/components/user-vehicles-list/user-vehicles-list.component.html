@@ -1,0 +1,136 @@
+<div class="vehicles-container mat-background-primary">
+
+  <button class="fab-button" mat-fab extended color="primary" [routerLink]="['/users', id, 'vehicles', 'new']">
+    <mat-icon>add</mat-icon>
+    Agregar vehículo
+  </button>
+
+  <mat-card class="vehicles-out-card">
+    <mat-card-header>
+      <mat-card-title>Lista de vehículos</mat-card-title>
+      <mat-card-subtitle>En esta sección se muestran los vehículos que el usuario tiene registrados en el sistema
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <br>
+
+      @if (filteredDataStream.length === 0) {
+        <div class="no-vehicles">
+          <mat-icon>sentiment_dissatisfied</mat-icon>
+          <h2>No se encontraron vehículos</h2>
+        </div>
+      }
+      <mat-form-field *ngIf="filteredDataStream.length > 0">
+        <mat-label>Buscar vehículo</mat-label>
+        <input matInput (keyup)="applyFilter(search.value)" placeholder="Buscar vehículo..." [formControl]="filter"
+               #search>
+      </mat-form-field>
+
+      <mat-grid-list [cols]="getNumberOfColumns()">
+        @for (vehicle of filteredDataStream; track vehicle) {
+          <mat-grid-tile>
+            <mat-card class="vehicles-card" [style.background-color]="getRandomLightColor()">
+              <mat-card-header>
+                <mat-card-title>{{ vehicle.carRegistration }}</mat-card-title>
+                <mat-card-subtitle>ID: {{ vehicle.id }}</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="card-item">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="mr-2"
+                  >
+                    <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
+                    <path d="M9 22v-4h6v4"></path>
+                    <path d="M8 6h.01"></path>
+                    <path d="M16 6h.01"></path>
+                    <path d="M12 6h.01"></path>
+                    <path d="M12 10h.01"></path>
+                    <path d="M12 14h.01"></path>
+                    <path d="M16 10h.01"></path>
+                    <path d="M16 14h.01"></path>
+                    <path d="M8 10h.01"></path>
+                    <path d="M8 14h.01"></path>
+                  </svg>
+                  Marca: <span class="card-item-value">{{ vehicle.brand }}</span>
+                </div>
+                <div class="card-item">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="mr-2"
+                  >
+                    <path
+                      d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+                    <circle cx="7" cy="17" r="2"></circle>
+                    <path d="M9 17h6"></path>
+                    <circle cx="17" cy="17" r="2"></circle>
+                  </svg>
+                  Modelo: <span class="card-item-value">{{ vehicle.model }}</span>
+                </div>
+                <div class="card-item">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="mr-2"
+                  >
+                    <path d="m12 14 4-4"></path>
+                    <path d="M3.34 19a10 10 0 1 1 17.32 0"></path>
+                  </svg>
+                  Capacidad: <span class="card-item-value">{{ vehicle.capacity }} KW</span>
+                </div>
+                <div class="card-item">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="mr-2"
+                  >
+                    <path d="M12 22v-5"></path>
+                    <path d="M9 8V2"></path>
+                    <path d="M15 8V2"></path>
+                    <path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"></path>
+                  </svg>
+                  Conector: <span class="card-item-value">{{ vehicle.plugType }}</span>
+                </div>
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-button (click)="deleteVehicle(vehicle.id!)">Borrar</button>
+              </mat-card-actions>
+            </mat-card>
+          </mat-grid-tile>
+        }
+      </mat-grid-list>
+    </mat-card-content>
+
+
+  </mat-card>
+</div>

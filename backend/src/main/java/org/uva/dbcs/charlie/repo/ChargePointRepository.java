@@ -2,7 +2,6 @@ package org.uva.dbcs.charlie.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.uva.dbcs.charlie.model.ChargePoint;
-import org.uva.dbcs.charlie.model.Vehicle;
 import org.uva.dbcs.charlie.model.VehiclePlugType;
 
 import java.util.List;

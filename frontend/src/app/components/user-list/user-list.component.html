@@ -1,58 +1,48 @@
-<div class="example-container">
-
-  <div class="example-loading-shade"
-       *ngIf="isLoadingResults">
-    <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
-    <div class="example-rate-limit-reached">
-      Fetching users... Please be patient ;)
-    </div>
-  </div>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Usuarios</mat-card-title>
+    <mat-card-subtitle>Aquí encontrarás la información sobre todos los usuarios</mat-card-subtitle>
+  </mat-card-header>
 
   <button class="fab-button" mat-fab extended color="primary" [routerLink]="'/users/new'">
     <mat-icon>add</mat-icon>
     Añadir usuario
   </button>
 
-  <div class="user-top-layout">
-    <h2>Gestión de usuarios</h2>
-    <h3>Aquí encontrarás la información sobre todos los usuarios</h3>
-  </div>
-
-
-  <div class="example-table-container">
+  <mat-card-content>
+    <br>
     <div class="table-search-container">
       <div class="search-bar">
         <mat-icon>search</mat-icon>
-        <input type="search" placeholder="Search for users..." matInput (keyup)="applyFilter($event)">
+        <input type="search" placeholder="Buscar usuarios..." matInput #search (keyup)="applyFilter(search.value)">
       </div>
-
-      <mat-chip-listbox aria-label="Fish selection">
-        <mat-chip-option (selectionChange)="onChipSelectionChanged($event)" >Activos</mat-chip-option>
-        <mat-chip-option (selectionChange)="onChipSelectionChanged($event)" >Inactivos</mat-chip-option>
+      <mat-chip-listbox aria-label="Enabled users selection">
+        <mat-chip-option (selectionChange)="onChipSelectionChanged($event)">Activos</mat-chip-option>
+        <mat-chip-option (selectionChange)="onChipSelectionChanged($event)">Inactivos</mat-chip-option>
       </mat-chip-listbox>
     </div>
 
 
-    <mat-divider> </mat-divider>
+    <mat-divider></mat-divider>
 
     <table mat-table class="full-width-table" matSort aria-label="Elements">
       <!-- Id Column -->
       <ng-container matColumnDef="id">
         <th>
-          <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header>#</mat-header-cell>
         </th>
         <td>
-          <mat-cell *matCellDef="let user">{{user.id}}</mat-cell>
+          <mat-cell *matCellDef="let user">{{ user.id }}</mat-cell>
         </td>
       </ng-container>
 
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th>
-          <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Apodo</mat-header-cell>
         </th>
         <td>
-          <mat-cell *matCellDef="let user">{{user.name}}</mat-cell>
+          <mat-cell *matCellDef="let user">{{ user.name }}</mat-cell>
         </td>
       </ng-container>
 
@@ -61,7 +51,7 @@
           <mat-header-cell *matHeaderCellDef mat-sort-header>Nombre y Apellidos</mat-header-cell>
         </th>
         <td>
-          <mat-cell *matCellDef="let user">{{user.firstName}} {{user.lastName}}</mat-cell>
+          <mat-cell *matCellDef="let user">{{ user.firstName }} {{ user.lastName }}</mat-cell>
         </td>
       </ng-container>
 
@@ -70,37 +60,38 @@
           <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
         </th>
         <td>
-          <mat-cell *matCellDef="let user">{{user.email}}</mat-cell>
+          <mat-cell *matCellDef="let user">{{ user.email }}</mat-cell>
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="status">
-        <th>
-          <mat-header-cell *matHeaderCellDef mat-sort-header disabled="true ">Estado</mat-header-cell>
-        </th>
-        <td>
-          <mat-cell *matCellDef="let user">
-            <div *ngIf="user.enabled == true" class="status-success">Activo</div>
-            <div *ngIf="user.enabled == false" class="status-failed">Inactivo</div>
-          </mat-cell>
-        </td>
-      </ng-container>
 
       <ng-container matColumnDef="createdAt">
         <th>
-          <mat-header-cell *matHeaderCellDef mat-sort-header>Creado en</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de creación</mat-header-cell>
         </th>
         <td>
-          <mat-cell *matCellDef="let user">{{getDate(user.createdAt)}}</mat-cell>
+          <mat-cell *matCellDef="let user">{{ getDate(user.createdAt) }}</mat-cell>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="updatedAt">
         <th>
-          <mat-header-cell *matHeaderCellDef mat-sort-header>Actualizado en</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de actualización</mat-header-cell>
         </th>
         <td>
-          <mat-cell *matCellDef="let user">{{getDate(user.updatedAt)}}</mat-cell>
+          <mat-cell *matCellDef="let user">{{ getDate(user.updatedAt) }}</mat-cell>
+        </td>
+      </ng-container>
+
+
+      <ng-container matColumnDef="status">
+        <th>
+          <mat-header-cell *matHeaderCellDef mat-sort-header disabled="true">Estado</mat-header-cell>
+        </th>
+        <td>
+          <mat-cell *matCellDef="let user">
+            <app-user-status-component [status]="user.enabled"></app-user-status-component>
+          </mat-cell>
         </td>
       </ng-container>
 
@@ -112,11 +103,59 @@
         <td>
           <mat-cell *matCellDef="let user">
             <div id="actions_container">
-              <button type="button" class="ic_edit" [routerLink]="['/users', user.id, 'edit']">
-                <img class="action_img" ngSrc="assets/ic_edit.svg" alt="Edit" height="24" width="24">Edit
+              <button mat-stroked-button class="ic_action" [routerLink]="['/users', user.id, 'edit']">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4"
+                >
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
               </button>
-              <button type="button" class="ic_delete" (click)="deleteUser(user.id)">
-                <img class="action_img" ngSrc="assets/ic_delete.svg" height="24" width="24">Delete
+              <button mat-stroked-button class="ic_action" [routerLink]="['/users', user.id, 'vehicles']">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4"
+                >
+                  <path
+                    d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+                  <circle cx="7" cy="17" r="2"></circle>
+                  <path d="M9 17h6"></path>
+                  <circle cx="17" cy="17" r="2"></circle>
+                </svg>
+              </button>
+              <button mat-stroked-button class="ic_action" (click)="requestDeleteUser(user.id)">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                </svg>
               </button>
             </div>
           </mat-cell>
@@ -133,9 +172,14 @@
     <mat-paginator #paginator
                    [length]="dataSource.data.length"
                    [pageIndex]="0"
+                   [pageSize]="20"
+                   [pageSizeOptions]="[5, 10, 20, 50]"
                    aria-label="Select page">
     </mat-paginator>
-  </div>
+  </mat-card-content>
 
-
-</div>
+  <mat-card-footer>
+    <mat-progress-bar mode="indeterminate" *ngIf="isLoadingResults">
+    </mat-progress-bar>
+  </mat-card-footer>
+</mat-card>

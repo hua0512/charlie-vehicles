@@ -1,6 +1,24 @@
-<body>
-<!--<mat-toolbar color="primary">-->
-<!--  <h2>Sistema Charlie</h2>-->
-<!--</mat-toolbar>-->
-<router-outlet></router-outlet>
-</body>
+<div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
+  <mat-toolbar color="primary" class="example-toolbar">
+    <button mat-icon-button (click)="snav.toggle()"><mat-icon>menu</mat-icon></button>
+    <h1 class="example-app-name">{{pageTitle}}</h1>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="example-sidenav-container"
+                         [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
+    <mat-sidenav #snav [mode]="mobileQuery.matches ? 'over' : 'side'"
+                 [fixedInViewport]="mobileQuery.matches" fixedTopGap="56" >
+      <mat-nav-list>
+        @for (link of links; track link) {
+          <mat-list-item [activated]="link.isActive">
+            <a matListItemTitle href="./{{link.url}}">{{ link.name }}</a>
+          </mat-list-item>
+        }
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

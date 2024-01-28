@@ -83,7 +83,7 @@ public class VehicleController extends BaseController<VehicleRepository> {
   public Vehicle createVehicle(@RequestBody Vehicle vehicle) {
     // check if the vehicle is valid
     if (vehicle.getCarRegistration() == null || vehicle.getCarRegistration().isEmpty() || vehicle.getCarRegistration().length() > 10) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car registration is required and must be less than 30 characters");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car registration is required and must be less than 10 characters");
     }
     // check if vehicle already exists
     if (repo.existsVehicleByCarRegistration(vehicle.getCarRegistration())) {
@@ -145,7 +145,7 @@ public class VehicleController extends BaseController<VehicleRepository> {
   public void deleteVehicle(@PathVariable long id) {
     Vehicle vehicle = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
     if (repo.findAllByUserId_Id(vehicle.getUserId().getId()).size() == 1) {
-      User savedUser =  userRepo.getReferenceById(vehicle.getUserId().getId());
+      User savedUser = userRepo.getReferenceById(vehicle.getUserId().getId());
       changeUserStatus(savedUser, false);
     }
     repo.deleteById(id);

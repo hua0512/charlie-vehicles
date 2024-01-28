@@ -1,0 +1,62 @@
+<div class="vehicle_container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <h2>Creación de un nuevo vehiculo</h2>
+      </mat-card-title>
+      <mat-card-subtitle>
+        <h3>Introduzca los datos del vehiculo</h3>
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (submit)="onSubmit()">
+
+        <mat-form-field>
+          <mat-label>Matrícula</mat-label>
+          <input formControlName="carRegistration" matInput maxlength="10"
+                 type="text" placeholder="Introduzca una matrícula..." #carRegistration>
+          <mat-hint align="end">{{ carRegistration.value.length }}/10</mat-hint>
+          <mat-error *ngIf="form.invalid">La matricula debe tener entre 6 y 10 caracteres</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Marca</mat-label>
+          <input formControlName="brand" matInput maxlength="10"
+                 type="text" placeholder="Introduzca la marca..." #brand>
+          <mat-hint align="end">{{ model.value.length }}/10</mat-hint>
+          <mat-error *ngIf="form.invalid">La marca debe tener entre 3 y 20 caracteres</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Modelo</mat-label>
+          <input formControlName="model" matInput maxlength="10"
+                 type="text" placeholder="Introduzca el modelo..." #model>
+          <mat-hint align="end">{{ model.value.length }}/10</mat-hint>
+          <mat-error *ngIf="form.invalid">El modelo debe tener entre 3 y 20 caracteres</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Capacidad</mat-label>
+          <input formControlName="capacity" matInput
+                 type="text" placeholder="Introduzca la capacidad en KW..." #capacity>
+          <mat-error *ngIf="form.invalid">La capacidad debe estar en el rango de 1 y 1000</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Tipo de conector</mat-label>
+          <mat-select formControlName="plugType" #plugType required>
+            <mat-option *ngFor="let plugType of plugTypes" [value]="VehiclePlugtype[plugType]">
+              {{ VehiclePlugtype[plugType] }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="button_container">
+          <button mat-raised-button color="primary" [disabled]="!form.valid">Crear</button>
+          <button mat-raised-button color="warn" [routerLink]="['/users', userId, 'vehicles']">Cancelar</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+</div>
+
