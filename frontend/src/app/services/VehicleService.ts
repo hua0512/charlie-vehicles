@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {environment} from "../environments/environment";
 import {catchError, Observable, throwError} from "rxjs";
 import {Vehicle} from "../models/vehicle.model";
@@ -10,7 +10,7 @@ import {BaseService} from "./BaseService";
 })
 export class VehicleService extends BaseService {
 
-  private apiBaseUrl = `${environment.userApiUrl}vehicles`;
+  private apiBaseUrl = `${environment.vehiclesApiUrl}/vehicles`;
 
   constructor(http: HttpClient) {
     super(http);
@@ -53,7 +53,7 @@ export class VehicleService extends BaseService {
     if (!userId) {
       throw new Error('User id is required');
     }
-    return this.http.get<Vehicle[]>(`${environment.userApiUrl}users/${userId}/vehicles`).pipe(
+    return this.http.get<Vehicle[]>(`${environment.userApiUrl}/users/${userId}/vehicles`).pipe(
       catchError(this.handleError)
     );
   }

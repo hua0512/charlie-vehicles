@@ -76,10 +76,7 @@ export class UserVehiclesFormComponent implements OnInit {
 
   onSubmit() {
     const formValue = this.form.value;
-    // TODO :  REMOVE WHEN MODEL IS FIXED
-    formValue.userId = {
-      id: this.userId
-    };
+    formValue.userId = this.userId;
     console.log(formValue);
     this.service.postVehicle(formValue).subscribe({
       next: () => {

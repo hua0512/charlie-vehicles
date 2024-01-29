@@ -2,27 +2,65 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {UserListComponent} from "./components/user-list/user-list.component";
 import {UserProfileComponent} from "./components/user-profile/user-profile.component";
-import {DashboardComponent} from "./components/dashboard/dashboard.component";
 import {UserVehiclesListComponent} from "./components/user-vehicles-list/user-vehicles-list.component";
 import {UserVehiclesFormComponent} from "./components/user-vehicles-form/user-vehicles-form.component";
 import {ChargerpointsListComponent} from "./components/chargerpoints-list/chargerpoints-list.component";
 import {ChargerpointsFormComponent} from "./components/chargerpoints-form/chargerpoints-form.component";
+import {LoginComponent} from "./components/login/login.component";
+import {authGuard} from "./auth/auth.guard";
+import {PageNotFoundComponent} from "./components/page-not-found/page-not-found.component";
 
 
 const routes: Routes = [
-  {path: 'users', component: UserListComponent},
-  {path: 'users/:id/edit', component: UserProfileComponent},
-  {path: 'users/new', component: UserProfileComponent},
-  {path: 'dashboard', component: DashboardComponent},
-  {path: 'users/:id/vehicles', component: UserVehiclesListComponent},
-  {path: 'users/:id/vehicles/new', component: UserVehiclesFormComponent},
-  {path: 'chargerpoints', component: ChargerpointsListComponent},
-  {path: 'chargerpoints/new', component: ChargerpointsFormComponent},
-  {path: '', redirectTo: '/users', pathMatch: 'full'}
+  {
+    path: 'users',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: ':id/edit',
+        component: UserProfileComponent,
+      },
+      {
+        path: ':id/vehicles',
+        component: UserVehiclesListComponent,
+      },
+      {
+        path: ':id/vehicles/new',
+        component: UserVehiclesFormComponent,
+      },
+      {
+        path: 'new',
+        component: UserProfileComponent,
+      },
+      {
+        path: '',
+        component: UserListComponent,
+      }
+    ]
+  },
+  {
+    path: "chargerpoints",
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'new',
+        component: ChargerpointsFormComponent,
+      },
+      {
+        path: '',
+        component: ChargerpointsListComponent,
+      }
+    ]
+  },
+  {path: 'login', component: LoginComponent},
+  {path: '', redirectTo: '/login', pathMatch: 'full'},
+  {path: '**', component: PageNotFoundComponent},
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {
+    enableTracing: false,
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule {

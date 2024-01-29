@@ -10,7 +10,7 @@ import {ChargerPoint} from "../models/chargerpoint.model";
 })
 export class ChargerPointService extends BaseService {
 
-  private apiBaseUrl = `${environment.userApiUrl}chargerpoints`;
+  private apiBaseUrl = `${environment.chargerpointsApiUrl}/chargerpoints`;
 
   constructor(http: HttpClient) {
     super(http);
@@ -42,7 +42,7 @@ export class ChargerPointService extends BaseService {
   }
 
   getChargerPointsForVehicle(vehicleId: number)  : Observable<ChargerPoint[]>{
-    return this.http.get<ChargerPoint[]>(`${environment.userApiUrl}${vehicleId}/chargerpoints`).pipe(
+    return this.http.get<ChargerPoint[]>(`${environment.userApiUrl}/${vehicleId}/chargerpoints`).pipe(
       catchError(this.handleError)
     );
   }

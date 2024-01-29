@@ -41,24 +41,24 @@
             <mat-error *ngIf="myForm.invalid">El apellido debe tener entre 3 y 30 caracteres</mat-error>
           </mat-form-field>
           <br>
-          <mat-form-field hintLabel="Max 50 caracteres" appearance="outline">
+          <mat-form-field hintLabel="Max 30 caracteres" appearance="outline">
             <mat-label>Email</mat-label>
-            <input matInput [type]="'email'" id="email" maxlength="50" formControlName="email" #email
+            <input matInput [type]="'email'" id="email" maxlength="30" formControlName="email" #email
                    placeholder="pet@example.com">
-            <mat-hint align="end">{{ email.value.length }}/50</mat-hint>
+            <mat-hint align="end">{{ email.value.length }}/30</mat-hint>
             <mat-error *ngIf="myForm.invalid">Se debe introducir un email válido</mat-error>
           </mat-form-field>
           <br>
-          <mat-form-field appearance="outline" hintLabel="Max 50 caracteres">
-            <mat-label>Password</mat-label>
-            <input matInput [type]="hide ? 'password' : 'text'" maxlength="50" formControlName="password" #password
-                   placeholder="Introduce tu contraseña...">
+          <mat-form-field appearance="outline" hintLabel="Tu contraseña está guardada de forma segura (solo lo sabes tu)">
+            <mat-label>{{getPasswordLabel()}}</mat-label>
+            <input matInput [type]="hide ? 'password' : 'text'" maxlength="20" formControlName="password" #password
+                   placeholder="Escribir nueva contraseña">
             <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
                     [attr.aria-pressed]="hide">
               <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
-            <mat-hint align="end">{{ password.value.length }}/50</mat-hint>
-            <mat-error *ngIf="myForm.invalid">La contraseña debe tener entre 8 y 50 caracteres</mat-error>
+            <mat-hint align="end">{{ password.value.length }}/20</mat-hint>
+            <mat-error *ngIf="myForm.invalid">La contraseña debe tener entre 6 y 20 caracteres</mat-error>
           </mat-form-field>
           <br>
           <mat-form-field appearance="outline" hintLabel="Max 16 caracteres">

@@ -2,6 +2,7 @@ import {ChangeDetectorRef, Component, OnDestroy} from '@angular/core';
 import {NavigationEnd, Router} from "@angular/router";
 import {filter} from "rxjs";
 import {MediaMatcher} from "@angular/cdk/layout";
+import {AuthService} from "./services/AuthService";
 
 @Component({
   selector: 'app-root',
@@ -20,9 +21,10 @@ export class AppComponent implements OnDestroy {
     {name: "Puntos de carga", isActive: false, url: "/chargerpoints"},
   ]
 
+  isLogged = this.authService.isLoggedin();
   private _mobileQueryListener: () => void;
 
-  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private router: Router) {
+  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private router: Router, private authService: AuthService) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
@@ -32,6 +34,11 @@ export class AppComponent implements OnDestroy {
       let url = (event as NavigationEnd).url;
       this.pageTitle = this.mapRouteToTitle(url)
       console.log(this.pageTitle);
+      if (url === 'login') {
+        this.isLogged = false;
+      }else{
+        this.isLogged = this.authService.isLoggedin();
+      }
     });
   }
 
@@ -47,6 +54,10 @@ export class AppComponent implements OnDestroy {
       return 'Nuevo Usuario';
     } else if (route === '/vehicles') {
       return 'Mis vehículos';
+    } else if (route === '/chargerpoints') {
+      return 'Puntos de carga';
+    } else if (route === '/chargerpoints/new') {
+      return 'Nuevo Punto de Carga';
     } else {
       return 'CharlieBackend';
     }
@@ -58,4 +69,16 @@ export class AppComponent implements OnDestroy {
   }
 
 
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  getIcon() {
+    if (this.isLogged) {
+      return "logout";
+    } else {
+      return "verified_user";
+    }
+  }
 }

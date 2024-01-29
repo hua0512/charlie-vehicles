@@ -4,18 +4,8 @@ import {throwError} from "rxjs";
 
 export class BaseService {
 
-    private _corsHeaders = new HttpHeaders({
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-        'Access-Control-Allow-Headers': '*',
-    });
-
-    constructor(protected http: HttpClient) {
-        httpOptions: {
-            headers: this._corsHeaders;
-        }
-
-    }
+  constructor(protected http: HttpClient) {
+  }
 
   protected handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
@@ -26,7 +16,13 @@ export class BaseService {
       // The response body may contain clues as to what went wrong.
       if (error.error) {
         console.error(`Backend returned code ${error.status}, body was: ${error.error.message}`);
-        return throwError(() => error.error.message);
+        if (error.error.message) {
+          return throwError(() => error.error.message);
+        }
+        return throwError(() => error.error);
+      } else {
+        console.error(`Backend returned code ${error.status}, body was: ${error.message}`);
+        return throwError(() => error.message);
       }
     }
     // Return an observable with a user-facing error message.

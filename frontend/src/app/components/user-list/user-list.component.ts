@@ -8,7 +8,7 @@ import {UserService} from "../../services/UserService";
 import {MatChipSelectionChange, MatChipsModule} from "@angular/material/chips";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {MatIconModule} from "@angular/material/icon";
-import {RouterLink} from "@angular/router";
+import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
 import {MatListModule} from "@angular/material/list";
 import {NgIf, NgOptimizedImage} from "@angular/common";
 import {MatInputModule} from "@angular/material/input";
@@ -17,7 +17,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatDialog} from "@angular/material/dialog";
 import {UserDeleteDialog} from "../user-delete-dialog/user-delete-dialog";
-import {MatCardHeader, MatCardModule} from "@angular/material/card";
+import {MatCardModule} from "@angular/material/card";
 import {UserStatusComponentComponent} from "../user-status-component/user-status-component.component";
 import {MatProgressBar} from "@angular/material/progress-bar";
 
@@ -42,6 +42,8 @@ import {MatProgressBar} from "@angular/material/progress-bar";
     MatCardModule,
     UserStatusComponentComponent,
     MatProgressBar,
+    RouterLinkActive,
+    RouterOutlet,
   ],
   standalone: true
 })
@@ -210,6 +212,8 @@ export class UserListComponent implements AfterViewInit {
    */
   private loadUsers(enable?: boolean): void {
     this.isLoadingResults = true;
+    // clear data source
+    this.dataSource.data = [];
     this.userService.getUsers(enable).subscribe(
       {
         next: (users) => {

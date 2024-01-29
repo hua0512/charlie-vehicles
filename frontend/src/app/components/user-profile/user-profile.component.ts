@@ -73,9 +73,9 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
       lastName:
         [this.user.lastName, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
       password:
-        [this.user.password, [Validators.required, Validators.minLength(6), Validators.maxLength(50)]],
+        ["", [Validators.required, Validators.minLength(6), Validators.maxLength(20)]],
       email:
-        [this.user.email, [Validators.required, Validators.email, Validators.maxLength(100)]],
+        [this.user.email, [Validators.required, Validators.email, Validators.maxLength(30)]],
       // add a validator to check paymentcard format
       paymentCard: [this.user.paymentCard, [Validators.maxLength(16), Validators.minLength(16), Validators.pattern("^[0-9]*$")]],
       createdAt: [this.getDate(this.user.createdAt)],
@@ -103,6 +103,10 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
             this.user = user;
             console.log("User: " + JSON.stringify(this.user));
             this._initForm();
+            // password is not required to change
+            this.myForm.get('password')?.removeValidators(Validators.required);
+            this.myForm.get('password')?.removeValidators(Validators.minLength(6));
+            this.myForm.get('password')?.updateValueAndValidity();
             this.loading = false;
           },
           error: (err) => console.log("Error: " + err)
@@ -127,7 +131,18 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
       // check if email is valid
       if (status == "VALID") {
         // TODO : call api to check if email is already in use
-        console.log("Email valido");
+        this.userService.getUserByEmail(this.myForm.value.email).subscribe(
+          {
+            next: (user) => {
+              console.log("User: " + JSON.stringify(user));
+              console.log("Email en uso");
+              this.myForm.get('email')?.setErrors({emailInUse: true, hintLabel: "Email en uso"});
+            },
+            error: (err) => {
+              console.log("Email valido");
+            }
+          }
+        )
       }
     });
   }
@@ -136,7 +151,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
   }
 
-  private hasChanged : boolean = false;
+  private hasChanged: boolean = false;
 
   onSubmit() {
     console.log("Enviado formulario");
@@ -145,15 +160,15 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
     // obtenemos datos del formulario
     // solo actualizamos los campos que se han modificado
     // solo se puede modificar email, contraseña y tarjeta de pago
-    let formEmail = this.myForm.get('email')?.value;
-    let formPassword = this.myForm.get('password')?.value;
-    let formPayment = this.myForm.get('paymentCard')?.value;
+    let formEmail = this.myForm.value.email;
+    let formPassword = this.myForm.value.password;
+    let formPayment = this.myForm.value.paymentCard;
 
 
     if (this.operation == "new") {
-      this.user.name = this.myForm.get('name')?.value;
-      this.user.firstName = this.myForm.get('firstName')?.value;
-      this.user.lastName = this.myForm.get('lastName')?.value;
+      this.user.name = this.myForm.value.name
+      this.user.firstName = this.myForm.value.firstName;
+      this.user.lastName = this.myForm.value.lastName;
       this.user.password = formPassword
       this.user.email = formEmail;
       this.user.paymentCard = formPayment;
@@ -174,10 +189,12 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    if (formPassword != this.user.password) {
+    // check if password is not empty
+    if (formPassword != null && formPassword != "") {
       this.user.password = formPassword;
       this.hasChanged = true;
     }
+
     if (formEmail != this.user.email) {
       this.user.email = formEmail;
       this.hasChanged = true;
@@ -228,5 +245,9 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
   getHintLabel(number: number) {
     return this.id ? 'No modificable' : 'Máximo ' + number + ' caracteres'
+  }
+
+  getPasswordLabel() {
+    return this.id ? 'Nueva contraseña' : 'Contraseña'
   }
 }
