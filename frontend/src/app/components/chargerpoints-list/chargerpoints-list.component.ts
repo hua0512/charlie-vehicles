@@ -101,7 +101,7 @@ export class ChargerpointsListComponent implements AfterViewInit {
     this.dataService.getAll().subscribe({
       next: (data) => {
         // delay 1000ms to show loading
-       setTimeout(() => {
+        setTimeout(() => {
           this.dataSource.data = data;
           this.isLoadingResults = false;
         }, 1000);
@@ -178,7 +178,12 @@ export class ChargerpointsListComponent implements AfterViewInit {
 
 
   applyFilterByState(value: string) {
-    this.dataSource.filter = value.trim().toLowerCase();
+    const filterLower = value.toLowerCase();
+    if (filterLower === 'all') {
+      this.dataSource.filter = ''; // reset filter
+    } else {
+      this.dataSource.filter = value.trim().toLowerCase();
+    }
     // Reset paginator on filter change
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();

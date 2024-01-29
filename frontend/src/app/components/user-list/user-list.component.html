@@ -1,10 +1,11 @@
+<router-outlet></router-outlet>
 <mat-card>
   <mat-card-header>
     <mat-card-title>Usuarios</mat-card-title>
     <mat-card-subtitle>Aquí encontrarás la información sobre todos los usuarios</mat-card-subtitle>
   </mat-card-header>
 
-  <button class="fab-button" mat-fab extended color="primary" [routerLink]="'/users/new'">
+  <button class="fab-button" mat-fab extended color="primary" [routerLink]="'./new'" routerLinkActive>
     <mat-icon>add</mat-icon>
     Añadir usuario
   </button>
@@ -103,7 +104,7 @@
         <td>
           <mat-cell *matCellDef="let user">
             <div id="actions_container">
-              <button mat-stroked-button class="ic_action" [routerLink]="['/users', user.id, 'edit']">
+              <button mat-stroked-button class="ic_action" [routerLink]="['./', user.id, 'edit']">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -120,7 +121,7 @@
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
               </button>
-              <button mat-stroked-button class="ic_action" [routerLink]="['/users', user.id, 'vehicles']">
+              <button mat-stroked-button class="ic_action" [routerLink]="['./', user.id, 'vehicles']">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"

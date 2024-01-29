@@ -1,0 +1,175 @@
+version: '3.9'
+
+volumes:
+  users_data: { }
+  vehicles_data: { }
+  chargerpoints_data: { }
+
+networks: #Red interna para comunicar los servicios (“Services on the same network can communicate with each other using their name”)
+  kong-net:
+  users-net:
+
+services:
+  auth-api:
+    image: auth-api-image
+    build:
+      context: ./auth-service
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    networks:
+      - kong-net
+    environment:
+      PORT: 8081
+      USER_API_URL: "http://users-api:8080/users"
+    depends_on:
+      - users-api
+  users-api:
+    image: users-api-image
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+    networks:
+      - kong-net
+      - users-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://users-database:3306/charlie-users?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: charlie
+      SPRING_DATASOURCE_PASSWORD: charlie
+      USER_API_URL: "http://users-api:8080"
+      VEHICLES_API_URL: "http://vehicles-api:8080"
+      CHARGERPOINTS_API_URL: "http://chargerpoints-api:8080"
+      PUBLIC_KEY: "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAljzY8N1WcQNGRhR2uMl0 i5Bda/uwokjQQ2z89HyMfwXwZyoNumleC9dCLIKzW73dYngZY+KaUorrXH4i/Cyj ONKWedjOjp/jKHqosW3u5IHSVWc1ww5XTSplBjg7o9ztFrjZCy+ceIvZlaKSVt0s 9x0WTCV3ZwOrEB/rez3SHSHvCJAr3RsYDoymGFoaKQ52oatOjNo+YtXCfc2Iuedf daLD2FiGX9t6of/UtLyPDBVfMAOHI70VXXmKzUNIktIW35V9e6YRZOd25p0ODttJ kZTr31v8VXk251tSLnF3DGTaYc3Z2eDHPp5yhnoqapIj35468oBhC2qrYM5HZ1gJ SQwyldpDyKxMEJHyeEy4vLbVt68iChilY8diHbc9W6HLdXLbdfe7DwRPzcjlYb4j GATx6AX8HzXhS/XZcekMVs7xew59ucWxTflK34grEhnkO67abPDShNooPUusQkwW lr1z9SLSz9OrvhCCrwzthAG50OU/T9QwN265bZDObQ4Ei641RUrQOl5nFee2EuYC 7vGdSbdm+lXkSzWwqvWH9kRzZldp68vwtPixmyj+N1LQ1USTAD629RpnG68RDOLl h2xmwQ0IF3eLi/Re72IZPhSE8waYSEYrU9KT3xPk9jzpjiSN96mYV27j6d5/ACrt +xD+3jKSjfubGZ16z7fKwt0CAwEAAQ=="
+    depends_on:
+      users-database:
+        condition: service_healthy
+  vehicles-api:
+    image: vehicles-api-image
+    build:
+      context: .
+      dockerfile: ./vehicles-service/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8083:8080"
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://vehicles-database:3306/charlie-vehicles?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: charlie
+      SPRING_DATASOURCE_PASSWORD: charlie
+      USER_API_URL: "http://users-api:8080"
+      VEHICLES_API_URL: "http://vehicles-api:8080"
+      CHARGERPOINTS_API_URL: "http://chargerpoints-api:8080"
+      PUBLIC_KEY: "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAljzY8N1WcQNGRhR2uMl0 i5Bda/uwokjQQ2z89HyMfwXwZyoNumleC9dCLIKzW73dYngZY+KaUorrXH4i/Cyj ONKWedjOjp/jKHqosW3u5IHSVWc1ww5XTSplBjg7o9ztFrjZCy+ceIvZlaKSVt0s 9x0WTCV3ZwOrEB/rez3SHSHvCJAr3RsYDoymGFoaKQ52oatOjNo+YtXCfc2Iuedf daLD2FiGX9t6of/UtLyPDBVfMAOHI70VXXmKzUNIktIW35V9e6YRZOd25p0ODttJ kZTr31v8VXk251tSLnF3DGTaYc3Z2eDHPp5yhnoqapIj35468oBhC2qrYM5HZ1gJ SQwyldpDyKxMEJHyeEy4vLbVt68iChilY8diHbc9W6HLdXLbdfe7DwRPzcjlYb4j GATx6AX8HzXhS/XZcekMVs7xew59ucWxTflK34grEhnkO67abPDShNooPUusQkwW lr1z9SLSz9OrvhCCrwzthAG50OU/T9QwN265bZDObQ4Ei641RUrQOl5nFee2EuYC 7vGdSbdm+lXkSzWwqvWH9kRzZldp68vwtPixmyj+N1LQ1USTAD629RpnG68RDOLl h2xmwQ0IF3eLi/Re72IZPhSE8waYSEYrU9KT3xPk9jzpjiSN96mYV27j6d5/ACrt +xD+3jKSjfubGZ16z7fKwt0CAwEAAQ=="
+    depends_on:
+      vehicles-database:
+        condition: service_healthy
+  chargerpoints-api:
+    image: chargerpoints-api-image
+    build:
+      context: .
+      dockerfile: ./chargerpoints-service/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8088:8080"
+    networks: # Networks to join
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://chargerpoints-database:3306/charlie-points?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: charlie
+      SPRING_DATASOURCE_PASSWORD: charlie
+      USER_API_URL: "http://users-api:8080"
+      VEHICLES_API_URL: "http://vehicles-api:8080"
+      CHARGERPOINTS_API_URL: "http://chargerpoints-api:8080"
+      PUBLIC_KEY: "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAljzY8N1WcQNGRhR2uMl0 i5Bda/uwokjQQ2z89HyMfwXwZyoNumleC9dCLIKzW73dYngZY+KaUorrXH4i/Cyj ONKWedjOjp/jKHqosW3u5IHSVWc1ww5XTSplBjg7o9ztFrjZCy+ceIvZlaKSVt0s 9x0WTCV3ZwOrEB/rez3SHSHvCJAr3RsYDoymGFoaKQ52oatOjNo+YtXCfc2Iuedf daLD2FiGX9t6of/UtLyPDBVfMAOHI70VXXmKzUNIktIW35V9e6YRZOd25p0ODttJ kZTr31v8VXk251tSLnF3DGTaYc3Z2eDHPp5yhnoqapIj35468oBhC2qrYM5HZ1gJ SQwyldpDyKxMEJHyeEy4vLbVt68iChilY8diHbc9W6HLdXLbdfe7DwRPzcjlYb4j GATx6AX8HzXhS/XZcekMVs7xew59ucWxTflK34grEhnkO67abPDShNooPUusQkwW lr1z9SLSz9OrvhCCrwzthAG50OU/T9QwN265bZDObQ4Ei641RUrQOl5nFee2EuYC 7vGdSbdm+lXkSzWwqvWH9kRzZldp68vwtPixmyj+N1LQ1USTAD629RpnG68RDOLl h2xmwQ0IF3eLi/Re72IZPhSE8waYSEYrU9KT3xPk9jzpjiSN96mYV27j6d5/ACrt +xD+3jKSjfubGZ16z7fKwt0CAwEAAQ=="
+    depends_on:
+      chargerpoints-database:
+        condition: service_healthy
+  angular-app:
+    image: angular-app-image
+    build:
+      context: ../frontend
+      dockerfile: ../frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8091:80"
+    networks:
+      - kong-net
+    environment:
+      VEHICLES_API_URL: "http://vehicles-api:8080"
+      LOGIN_API_URL: "http://auth-api:8081"
+      CHARGERPOINTS_API_URL: "http://chargerpoints-api:8080"
+      USER_API_URL: "http://users-api:8080"
+  users-database:
+    image: mysql #Usamos imagen del respositorio ya creada
+    hostname: users-database
+    cap_add:
+      - SYS_NICE
+    restart: always
+    ports:
+      - "3334:3306"
+    networks:
+      - users-net
+    volumes:
+      - users_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: charlie-data-admin
+      MYSQL_PASSWORD: charlie
+      MYSQL_USER: charlie
+      MYSQL_DATABASE: charlie-users
+      MYSQL_ROOT_HOST: '%'
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  vehicles-database:
+    image: mysql
+    hostname: vehicles-database
+    cap_add:
+      - SYS_NICE
+    restart: always
+    ports:
+      - "3335:3306"
+    networks:
+      - kong-net
+    volumes:
+      - vehicles_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: charlie-data-admin
+      MYSQL_PASSWORD: charlie
+      MYSQL_USER: charlie
+      MYSQL_DATABASE: charlie-vehicles
+      MYSQL_ROOT_HOST: '%'
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  chargerpoints-database:
+    image: mysql
+    hostname: chargerpoints-database
+    cap_add:
+      - SYS_NICE
+    restart: always
+    ports:
+      - "3333:3306"
+    networks:
+      - kong-net
+    volumes:
+      - chargerpoints_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: charlie-data-admin
+      MYSQL_PASSWORD: charlie
+      MYSQL_DATABASE: charlie-points
+      MYSQL_USER: charlie
+      MYSQL_ROOT_HOST: '%'
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {catchError, Observable, throwError} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {catchError, Observable} from 'rxjs';
 import {User} from '../models/user.model';
 import {environment} from "../environments/environment";
 import {BaseService} from "./BaseService";
@@ -9,11 +9,11 @@ import {BaseService} from "./BaseService";
   providedIn: 'root',
 })
 export class UserService extends BaseService {
-  private apiBaseUrl = `${environment.userApiUrl}users`;
-
+  private apiBaseUrl = `${environment.userApiUrl}/users`;
 
   constructor(http: HttpClient) {
     super(http);
+    console.log("apiBaseUrl: " + this.apiBaseUrl)
   }
 
   getUsers(enable?: boolean): Observable<User[]> {
@@ -22,6 +22,12 @@ export class UserService extends BaseService {
       url += `?enable=${enable}`;
     }
     return this.http.get<User[]>(url);
+  }
+
+  getUserByEmail(email: string): Observable<User> {
+    return this.http.get<User>(`${this.apiBaseUrl}/?email=${email}`).pipe(
+      catchError(this.handleError)
+    );
   }
 
   getUser(id: number): Observable<User> {

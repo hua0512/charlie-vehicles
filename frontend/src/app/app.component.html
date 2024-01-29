@@ -1,17 +1,24 @@
 <div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
   <mat-toolbar color="primary" class="example-toolbar">
-    <button mat-icon-button (click)="snav.toggle()"><mat-icon>menu</mat-icon></button>
-    <h1 class="example-app-name">{{pageTitle}}</h1>
+    <button mat-icon-button (click)="snav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <h1 class="example-app-name">{{ pageTitle }}</h1>
+    <span class="example-spacer"></span>
+    <!-- Add logout icon here -->
+    <button *ngIf="isLogged" mat-icon-button (click)="logout()" matTooltip="Cerrar sessión">
+      <mat-icon>{{ getIcon() }}</mat-icon>
+    </button>
   </mat-toolbar>
 
   <mat-sidenav-container class="example-sidenav-container"
                          [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
     <mat-sidenav #snav [mode]="mobileQuery.matches ? 'over' : 'side'"
-                 [fixedInViewport]="mobileQuery.matches" fixedTopGap="56" >
+                 [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
       <mat-nav-list>
         @for (link of links; track link) {
           <mat-list-item [activated]="link.isActive">
-            <a matListItemTitle href="./{{link.url}}">{{ link.name }}</a>
+            <a matListItemTitle href="{{link.url}}">{{ link.name }}</a>
           </mat-list-item>
         }
       </mat-nav-list>

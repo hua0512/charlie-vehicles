@@ -2,16 +2,18 @@ import {NgModule} from '@angular/core';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {UserService} from "./services/UserService";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {RouterLink} from "@angular/router";
-import {MatSidenav, MatSidenavContainer, MatSidenavModule} from "@angular/material/sidenav";
+import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatListItem, MatNavList} from "@angular/material/list";
 import {MatToolbar} from "@angular/material/toolbar";
 import {MatIconButton} from "@angular/material/button";
-import {MatIcon, MatIconModule} from "@angular/material/icon";
+import {MatIconModule} from "@angular/material/icon";
+import {AuthInterceptor} from "./auth/auth-interceptor";
+import {MatTooltip} from "@angular/material/tooltip";
 
 
 @NgModule({
@@ -29,9 +31,13 @@ import {MatIcon, MatIconModule} from "@angular/material/icon";
     MatListItem,
     MatToolbar,
     MatIconModule,
-    MatIconButton
+    MatIconButton,
+    MatTooltip
   ],
-  providers: [UserService],
+  providers: [
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+    UserService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

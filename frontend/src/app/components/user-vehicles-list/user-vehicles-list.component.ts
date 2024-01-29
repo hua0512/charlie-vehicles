@@ -11,6 +11,8 @@ import {MatFormFieldModule, MatLabel} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from "@angular/forms";
 import {NgIf} from "@angular/common";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
   selector: 'app-user-vehicles',
@@ -30,7 +32,9 @@ import {NgIf} from "@angular/common";
     RouterLink,
     FormsModule,
     ReactiveFormsModule,
-    NgIf
+    NgIf,
+    MatProgressSpinner,
+    MatProgressBar
   ],
   templateUrl: './user-vehicles-list.component.html',
   styleUrl: './user-vehicles-list.component.css',
@@ -50,6 +54,7 @@ export class UserVehiclesListComponent implements OnInit {
   // filter
   filter = new FormControl();
 
+  isLoading = false;
   // current user id
   protected id: number = 0;
 
@@ -81,15 +86,18 @@ export class UserVehiclesListComponent implements OnInit {
   }
 
   private loadVehicles() {
+    this.isLoading = true;
     this.service.getVehiclesByUser(this.id).subscribe(
       {
         next: (vehicles) => {
           this.dataStream = vehicles;
           this.filteredDataStream = [...this.dataStream];
+          this.isLoading = false;
         },
         error: (err) => {
           console.log(err);
           this.showSnackBar("Error al cargar los vehículos");
+          this.isLoading = false;
         }
       }
     );
@@ -158,13 +166,16 @@ export class UserVehiclesListComponent implements OnInit {
    * @return {void}
    */
   deleteVehicle(id: number) {
+    this.isLoading = true;
     this.service.deleteVehicle(id).subscribe({
       next: () => {
         this.showSnackBar("Vehículo eliminado");
         this.loadVehicles();
+        this.isLoading = false;
       },
       error: (err) => {
         this.showSnackBar("Error al eliminar vehículo: " + err);
+        this.isLoading = false;
       }
     })
   }
