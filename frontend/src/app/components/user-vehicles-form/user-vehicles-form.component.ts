@@ -43,6 +43,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 export class UserVehiclesFormComponent implements OnInit {
   plugTypes = [VehiclePlugtype.Schuko, VehiclePlugtype.CSS, VehiclePlugtype.Mennekes, VehiclePlugtype.CHAdeMO]
 
+  isLoading = false;
   form: FormGroup = new FormGroup({});
   userId: number = 0;
 
@@ -78,13 +79,16 @@ export class UserVehiclesFormComponent implements OnInit {
     const formValue = this.form.value;
     formValue.userId = this.userId;
     console.log(formValue);
+    this.isLoading = true;
     this.service.postVehicle(formValue).subscribe({
       next: () => {
+        this.isLoading = false;
         this.router.navigate(['/users/' + this.userId + '/vehicles']).then(r => this.snackBar.open("Vehículo creado", "Close", {
           duration: 2000,
         }));
       },
       error: (err) => {
+        this.isLoading = false;
         this.snackBar.open("Error en crear vehiculo: " + err, "Close", {
           duration: 2000,
         });

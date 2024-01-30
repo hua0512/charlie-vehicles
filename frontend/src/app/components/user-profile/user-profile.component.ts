@@ -127,24 +127,6 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
         updatedAt: ''
       };
     }
-    this.myForm.get('email')?.statusChanges.subscribe((status) => {
-      // check if email is valid
-      if (status == "VALID") {
-        // TODO : call api to check if email is already in use
-        this.userService.getUserByEmail(this.myForm.value.email).subscribe(
-          {
-            next: (user) => {
-              console.log("User: " + JSON.stringify(user));
-              console.log("Email en uso");
-              this.myForm.get('email')?.setErrors({emailInUse: true, hintLabel: "Email en uso"});
-            },
-            error: (err) => {
-              console.log("Email valido");
-            }
-          }
-        )
-      }
-    });
   }
 
   ngAfterViewInit(): void {
