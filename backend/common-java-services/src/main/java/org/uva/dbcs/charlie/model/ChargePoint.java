@@ -2,7 +2,7 @@ package org.uva.dbcs.charlie.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.io.Serializable;
 

@@ -2,8 +2,6 @@ package org.uva.dbcs.charlie.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +31,9 @@ import java.util.Optional;
 @RequestMapping("/users")
 public class UserController extends BaseController<UserRepository> {
 
-  // bCrypt password encoder
-  private final PasswordEncoder bCryptPasswordEncoder;
+
+//  // bCrypt password encoder
+  public PasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(BCryptPasswordEncoder.BCryptVersion.$2B);
 
   private final VehicleApiService vehicleApiService;
 
@@ -44,9 +43,8 @@ public class UserController extends BaseController<UserRepository> {
    *
    * @param repo interfaz jpa de usuario
    */
-  public UserController(UserRepository repo, PasswordEncoder bCryptPasswordEncoder, VehicleApiService vehicleApiService) {
+  public UserController(UserRepository repo, VehicleApiService vehicleApiService) {
     super(repo);
-    this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.vehicleApiService = vehicleApiService;
   }
 
