@@ -21,6 +21,8 @@ services:
     networks:
       - kong-net
     environment:
+      KEY_ID: "charlie"
+      SECRET: "QWIKEJQKWJEKQWJKQJEWKEQJWK"
       PORT: 8081
       USER_API_URL: "http://users-api:8080/users"
     depends_on:
