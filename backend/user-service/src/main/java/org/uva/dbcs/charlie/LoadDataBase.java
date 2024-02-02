@@ -38,7 +38,7 @@ public class LoadDataBase {
           randomDigits += (int) (Math.random() * 10);
         }
         String[] paymentCards = new String[]{"", randomDigits};
-        log.info("Preloading " + repository.save(new User("user" + i, "User" + i, "User" + i, "user" + i + "@example.com", "$2b$10$1Q3Th6eYM9fdXqDay.vKo.QersoQGZniQoeYf0n5mu6VH9f4tt.0a", paymentCards[(int) (Math.random() * 2)])));
+        log.info("Preloading " + repository.save(new User("uuuuser" + i, "User" + i, "User" + i, "user" + i + "@example.com", "$2b$10$1Q3Th6eYM9fdXqDay.vKo.QersoQGZniQoeYf0n5mu6VH9f4tt.0a", paymentCards[(int) (Math.random() * 2)])));
       }
     };
   }
