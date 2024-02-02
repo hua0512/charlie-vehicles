@@ -13,11 +13,12 @@ export const environment = {
   * 3. Se puede hacer echo de las variables de entorno en el terminal de docker desktop, pero no en el dockerfile ni en el runtime de la app.
   *
   * Por eso lo dejo hardcodeado...
-  * En fin, angular sucks (angular material too).
+  * FUCK angular, (AND FUCK angular material).
   *
   */
-  userApiUrl: "http://localhost:8082",
-  loginApiUrl: "http://localhost:8081",
-  vehiclesApiUrl: "http://localhost:8083",
-  chargerpointsApiUrl: "http://localhost:8088",
+  userApiUrl: "http://localhost:8082/users",
+  loginApiUrl: "http://localhost:8081/login",
+  vehiclesApiUrl: "http://localhost:8083/vehicles",
+  chargerpointsApiUrl: "http://localhost:8088/chargerpoints",
+  rechargeApiUrl : "http://localhost:8090/recharge"
 };

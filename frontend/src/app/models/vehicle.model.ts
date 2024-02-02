@@ -1,5 +1,3 @@
-import {VehiclePlugtype} from "./vehicle-plugtype.model";
-
 export interface Vehicle {
   id: number | undefined,
   carRegistration: string,
@@ -8,4 +6,8 @@ export interface Vehicle {
   model: string,
   capacity: number,
   plugType: VehiclePlugtype,
+}
+
+export enum VehiclePlugtype {
+  Schuko = 'Schuko', CSS = 'CSS', Mennekes = 'Mennekes', CHAdeMO = 'CHAdeMO'
 }

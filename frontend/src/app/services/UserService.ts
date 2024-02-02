@@ -9,7 +9,7 @@ import {BaseService} from "./BaseService";
   providedIn: 'root',
 })
 export class UserService extends BaseService {
-  private apiBaseUrl = `${environment.userApiUrl}/users`;
+  private apiBaseUrl = `${environment.userApiUrl}`;
 
   constructor(http: HttpClient) {
     super(http);
@@ -24,8 +24,8 @@ export class UserService extends BaseService {
     return this.http.get<User[]>(url);
   }
 
-  getUserByEmail(email: string): Observable<User> {
-    return this.http.get<User>(`${this.apiBaseUrl}/?email=${email}`).pipe(
+  getUserByEmail(email: string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiBaseUrl}/?email=${email}`).pipe(
       catchError(this.handleError)
     );
   }

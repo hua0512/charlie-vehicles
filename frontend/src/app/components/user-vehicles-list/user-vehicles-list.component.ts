@@ -11,7 +11,6 @@ import {MatFormFieldModule, MatLabel} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from "@angular/forms";
 import {NgIf} from "@angular/common";
-import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
@@ -33,7 +32,6 @@ import {MatProgressBar} from "@angular/material/progress-bar";
     FormsModule,
     ReactiveFormsModule,
     NgIf,
-    MatProgressSpinner,
     MatProgressBar
   ],
   templateUrl: './user-vehicles-list.component.html',

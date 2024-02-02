@@ -67,5 +67,9 @@
         </div>
       </form>
     </mat-card-content>
+
+    <mat-card-footer>
+      <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+    </mat-card-footer>
   </mat-card>
 </div>

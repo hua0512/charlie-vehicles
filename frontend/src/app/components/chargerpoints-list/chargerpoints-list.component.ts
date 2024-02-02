@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {MatCardModule} from "@angular/material/card";
-import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatFabButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
@@ -19,12 +18,11 @@ import {
   MatTable,
   MatTableDataSource
 } from "@angular/material/table";
-import {ChargerPoint} from "../../models/chargerpoint.model";
+import {ChargerPoint, ChargerpointStatus} from "../../models/chargerpoint.model";
 import {ChargerPointService} from "../../services/ChargerPointService";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatRipple} from "@angular/material/core";
 import {MatPaginator} from "@angular/material/paginator";
-import {ChargerpointStatus} from "../../models/chargerpoint-status.model";
 import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
@@ -32,7 +30,6 @@ import {MatProgressBar} from "@angular/material/progress-bar";
   standalone: true,
   imports: [
     MatCardModule,
-    MatProgressSpinner,
     NgIf,
     MatFabButton,
     MatFormFieldModule,
@@ -73,7 +70,7 @@ export class ChargerpointsListComponent implements AfterViewInit {
   dataSource = new MatTableDataSource<ChargerPoint>();
   displayedColumns = ['id', 'address', 'latitude', 'longitude', 'plugType', 'power', 'status']
   // array of possible values for status filter
-  protected chargerpointStatus = Object.values(ChargerpointStatus).filter(value => typeof value === 'string');
+  protected chargerpointStatus = Object.values(ChargerpointStatus);
 
   constructor(private dataService: ChargerPointService, private snackBar: MatSnackBar) {
     // load data
@@ -95,16 +92,12 @@ export class ChargerpointsListComponent implements AfterViewInit {
   }
 
   private loadData() {
-    console.log(Object.values(ChargerpointStatus).filter(value => typeof value === 'string'))
     this.isLoadingResults = true;
     // get all data from server
     this.dataService.getAll().subscribe({
       next: (data) => {
-        // delay 1000ms to show loading
-        setTimeout(() => {
-          this.dataSource.data = data;
-          this.isLoadingResults = false;
-        }, 1000);
+        this.dataSource.data = data;
+        this.isLoadingResults = false;
       },
       error: (err) => {
         console.log(err);

@@ -1,0 +1,62 @@
+<div class="recharges_container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <h2>Creación de una nueva recarga</h2>
+      </mat-card-title>
+      <mat-card-subtitle>
+        <h3>Introduzca los datos de la recarga</h3>
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (submit)="onSubmit()">
+        <mat-form-field>
+          <mat-label>Vehiculo a recargar</mat-label>
+          <mat-select formControlName="vehicleId" (selectionChange)="onVehicleChanged(vehicleId.value)" #vehicleId required>
+            <mat-option *ngFor="let data of vehicles" [value]="data.id">
+              {{ data.carRegistration }} - {{ data.brand }} - {{ data.model }} - {{ data.plugType }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Punto de carga</mat-label>
+          <mat-select formControlName="chargerpointId" #chargerpointId (selectionChange)="onChargerPointSelected(chargerpointId.value)" required>
+            <mat-option *ngFor="let data of compatibleChargerPoints" [value]="data.id">
+              {{ data.address }} - Carga {{ data.power }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <br>
+
+        <div class="maps-container">
+          <google-map [center]="{lat: selectedChargerPoint.latitude, lng: selectedChargerPoint.longitude}" [zoom]="5" #map *ngIf="selectedChargerPoint">
+            <map-marker *ngIf="selectedChargerPoint" [position]="{lat: selectedChargerPoint.latitude!, lng: selectedChargerPoint.longitude}"
+                        (mapClick)="openInfoWindow(selectedChargerPoint.id)">
+            </map-marker>
+            <map-info-window #infoWindow>
+              <p>{{ markerAdress }}</p>
+              <strong>Power: </strong>{{ markerPower }}<br>
+            </map-info-window>
+          </google-map>
+        </div>
+        <br>
+
+        <div class="button_container">
+          <button mat-raised-button color="primary" [disabled]="!form.valid">Crear</button>
+          <button mat-raised-button color="warn" [routerLink]="['/users', userId, 'recharges']">Cancelar</button>
+        </div>
+      </form>
+    </mat-card-content>
+
+
+
+    <br>
+    <mat-card-footer>
+      <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+    </mat-card-footer>
+  </mat-card>
+
+</div>
+

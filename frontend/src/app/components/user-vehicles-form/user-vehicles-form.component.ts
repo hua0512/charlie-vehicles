@@ -6,15 +6,14 @@ import {MatDivider} from "@angular/material/divider";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatIconModule} from "@angular/material/icon";
 import {MatInputModule} from "@angular/material/input";
-import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {NgForOf, NgIf} from "@angular/common";
 import {UserStatusComponentComponent} from "../user-status-component/user-status-component.component";
-import {Vehicle} from "../../models/vehicle.model";
 import {VehicleService} from "../../services/VehicleService";
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
-import {VehiclePlugtype} from "../../models/vehicle-plugtype.model";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatProgressBar} from "@angular/material/progress-bar";
+import {VehiclePlugtype} from "../../models/vehicle.model";
 
 @Component({
   selector: 'app-user-vehicles-form',
@@ -27,7 +26,6 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinner,
     NgIf,
     ReactiveFormsModule,
     UserStatusComponentComponent,
@@ -35,13 +33,14 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     MatSelect,
     MatOption,
     NgForOf,
-    RouterLink
+    RouterLink,
+    MatProgressBar
   ],
   templateUrl: './user-vehicles-form.component.html',
   styleUrl: './user-vehicles-form.component.css'
 })
 export class UserVehiclesFormComponent implements OnInit {
-  plugTypes = [VehiclePlugtype.Schuko, VehiclePlugtype.CSS, VehiclePlugtype.Mennekes, VehiclePlugtype.CHAdeMO]
+  plugTypes = Object.values(VehiclePlugtype)
 
   isLoading = false;
   form: FormGroup = new FormGroup({});

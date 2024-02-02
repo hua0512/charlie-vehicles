@@ -1,0 +1,155 @@
+<div>
+  <button class="fab-button" mat-fab extended color="primary" (click)="shouldGoToAdd()">
+    <mat-icon>add</mat-icon>
+    Nueva recarga
+  </button>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Lista de recargas</mat-card-title>
+      <mat-card-subtitle>Aquí encontrarás la información sobre todos las recargas</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="table-search-container">
+        <div class="search-bar">
+          <mat-icon>search</mat-icon>
+          <input type="search" placeholder="Buscar recargas..." matInput #search
+                 (keyup)="applyFilter(search.value)">
+        </div>
+        <!--        filtro por estado-->
+        <mat-form-field>
+          <mat-label>Filtro por estado</mat-label>
+          <mat-select placeholder="Estado" (selectionChange)="applyFilterByState($event.value)" >
+            <mat-option value="all">Todos</mat-option>
+            <mat-optgroup label="Por estado">
+              <mat-option *ngFor="let status of rechargeStatues" [value]="status">
+                {{ status }}
+              </mat-option>
+            </mat-optgroup>
+            <mat-optgroup label="Por estado de pago">
+              <mat-option *ngFor="let status of paymentStatus" [value]="status">
+                {{ status }}
+              </mat-option>
+            </mat-optgroup>
+
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+
+      <mat-divider></mat-divider>
+
+      <table mat-table class="full-width-table" matSort aria-label="Elements">
+
+
+        <!-- Id Column -->
+        <ng-container matColumnDef="id">
+          <th>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>#</mat-header-cell>
+          </th>
+          <td>
+            <mat-cell *matCellDef="let data">{{ data.id }}</mat-cell>
+          </td>
+        </ng-container>
+
+        <!-- address Column -->
+        <ng-container matColumnDef="vehicleId">
+          <th>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>N.vehículo</mat-header-cell>
+          </th>
+          <td>
+            <mat-cell *matCellDef="let data">{{ data.vehicleId }}</mat-cell>
+          </td>
+        </ng-container>
+
+        <!-- latitude Column -->
+        <ng-container matColumnDef="chargerpointId">
+          <th>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>N.punto de carga</mat-header-cell>
+          </th>
+          <td>
+            <mat-cell *matCellDef="let data">{{ data.chargerpointId }}</mat-cell>
+          </td>
+        </ng-container>
+
+
+        <ng-container matColumnDef="price">
+          <th>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Precio kWh</mat-header-cell>
+          </th>
+          <td>
+            <mat-cell *matCellDef="let data">{{ data.price }} €</mat-cell>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="kw">
+          <th>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>kW Cargado</mat-header-cell>
+          </th>
+          <td>
+            <mat-cell *matCellDef="let data">{{ data.kw > 0 ? data.kw : 0 }}</mat-cell>
+          </td>
+        </ng-container>
+
+        <!-- power Column -->
+
+        <ng-container matColumnDef="status">
+          <th>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Estado</mat-header-cell>
+          </th>
+          <td>
+            <mat-cell *matCellDef="let data">{{ data.status }}</mat-cell>
+          </td>
+        </ng-container>
+
+        <!-- state Column -->
+        <ng-container matColumnDef="payment">
+          <th>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Estado de pago</mat-header-cell>
+          </th>
+          <td>
+            <mat-cell *matCellDef="let data">{{ data.payment }}</mat-cell>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dateStart">
+          <th>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Fecha comienzo</mat-header-cell>
+          </th>
+          <td>
+            <mat-cell *matCellDef="let data">{{ getDate(data.dateStart) }}</mat-cell>
+          </td>
+        </ng-container>
+
+
+        <ng-container matColumnDef="dateEnd">
+          <th>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Fecha final</mat-header-cell>
+          </th>
+          <td>
+            <mat-cell *matCellDef="let data">{{ getDate(data.dateEnd) }}</mat-cell>
+          </td>
+        </ng-container>
+
+        <tr>
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        </tr>
+        <tr>
+          <mat-row mat-ripple *matRowDef="let data; columns: displayedColumns;" [routerLink]="[data.id]"></mat-row>
+        </tr>
+      </table>
+      <mat-paginator #paginator
+                     [length]="dataSource.data.length"
+                     [pageIndex]="0"
+                     [pageSize]="20"
+                     [pageSizeOptions]="[5, 10, 20, 50]"
+                     aria-label="Select page">
+      </mat-paginator>
+    </mat-card-content>
+    <mat-card-footer>
+      <mat-progress-bar mode="indeterminate" *ngIf="isLoadingResults">
+      </mat-progress-bar>
+    </mat-card-footer>
+  </mat-card>
+</div>

@@ -10,7 +10,7 @@ import {ChargerPoint} from "../models/chargerpoint.model";
 })
 export class ChargerPointService extends BaseService {
 
-  private apiBaseUrl = `${environment.chargerpointsApiUrl}/chargerpoints`;
+  private apiBaseUrl = `${environment.chargerpointsApiUrl}`;
 
   constructor(http: HttpClient) {
     super(http);

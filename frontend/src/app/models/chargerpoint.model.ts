@@ -1,6 +1,4 @@
-import {VehiclePlugtype} from "./vehicle-plugtype.model";
-import {ChargerpointPower} from "./chargerpoint-power.model";
-import {ChargerpointStatus} from "./chargerpoint-status.model";
+import {VehiclePlugtype} from "./vehicle.model";
 
 export interface ChargerPoint {
   id: number | undefined,
@@ -10,4 +8,12 @@ export interface ChargerPoint {
   plugType: VehiclePlugtype,
   power: ChargerpointPower,
   status: ChargerpointStatus
+}
+
+export enum ChargerpointPower {
+  LENTA = 'LENTA', MEDIA = 'MEDIA', RAPIDA = 'RAPIDA', ULTRA_RAPIDA = 'ULTRA_RAPIDA'
+}
+
+export enum ChargerpointStatus{
+  MANTENIMIENTO = "MANTENIMIENTO", DISPONIBLE = "DISPONIBLE", EN_SERVICIO = "EN_SERVICIO"
 }
