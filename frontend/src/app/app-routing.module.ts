@@ -9,6 +9,9 @@ import {ChargerpointsFormComponent} from "./components/chargerpoints-form/charge
 import {LoginComponent} from "./components/login/login.component";
 import {authGuard} from "./auth/auth.guard";
 import {PageNotFoundComponent} from "./components/page-not-found/page-not-found.component";
+import {UserRechargesListComponent} from "./components/user-recharges-list/user-recharges-list.component";
+import {UserRechargesFormComponent} from "./components/user-recharges-form/user-recharges-form.component";
+import {UserRechargeInfoComponent} from "./components/user-recharges-info/user-recharge-info.component";
 
 
 const routes: Routes = [
@@ -31,6 +34,18 @@ const routes: Routes = [
       {
         path: 'new',
         component: UserProfileComponent,
+      },
+      {
+        path: ':id/recharges',
+        component: UserRechargesListComponent,
+      },
+      {
+        path: ':id/recharges/new',
+        component: UserRechargesFormComponent,
+      },
+      {
+        path: ':id/recharges/:rechargeId',
+        component: UserRechargeInfoComponent,
       },
       {
         path: '',

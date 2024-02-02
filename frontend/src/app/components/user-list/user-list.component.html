@@ -17,10 +17,14 @@
         <mat-icon>search</mat-icon>
         <input type="search" placeholder="Buscar usuarios..." matInput #search (keyup)="applyFilter(search.value)">
       </div>
-      <mat-chip-listbox aria-label="Enabled users selection">
-        <mat-chip-option (selectionChange)="onChipSelectionChanged($event)">Activos</mat-chip-option>
-        <mat-chip-option (selectionChange)="onChipSelectionChanged($event)">Inactivos</mat-chip-option>
-      </mat-chip-listbox>
+      <mat-form-field>
+        <mat-label>Filtro por estado</mat-label>
+        <mat-select (selectionChange)="applyFilterByStatus($event.value)">
+          <mat-option value="all">Todos</mat-option>
+          <mat-option value="enabled">Activos</mat-option>
+          <mat-option value="disabled">Inactivos</mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
 
 
@@ -104,7 +108,8 @@
         <td>
           <mat-cell *matCellDef="let user">
             <div id="actions_container">
-              <button mat-stroked-button class="ic_action" [routerLink]="['./', user.id, 'edit']">
+              <button mat-stroked-button class="ic_action" matTooltip="Editar perfil"
+                      [routerLink]="['./', user.id, 'edit']">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -121,7 +126,8 @@
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
               </button>
-              <button mat-stroked-button class="ic_action" [routerLink]="['./', user.id, 'vehicles']">
+              <button mat-stroked-button class="ic_action" matTooltip="Vehiculos"
+                      [routerLink]="['./', user.id, 'vehicles'] ">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -141,7 +147,25 @@
                   <circle cx="17" cy="17" r="2"></circle>
                 </svg>
               </button>
-              <button mat-stroked-button class="ic_action" (click)="requestDeleteUser(user.id)">
+              <button mat-stroked-button class="ic_action" matTooltip="Recargas"
+                      [routerLink]="['./', user.id, 'recharges']">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4"
+                >
+                  <rect width="16" height="10" x="2" y="7" rx="2" ry="2"></rect>
+                  <line x1="22" x2="22" y1="11" y2="13"></line>
+                </svg>
+              </button>
+              <button mat-stroked-button class="ic_action" matTooltip="Borrar" (click)="requestDeleteUser(user.id)">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"

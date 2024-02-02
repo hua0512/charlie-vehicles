@@ -5,14 +5,13 @@ import {MatSort, MatSortModule} from '@angular/material/sort';
 import {ReplaySubject} from "rxjs";
 import {User} from "../../models/user.model";
 import {UserService} from "../../services/UserService";
-import {MatChipSelectionChange, MatChipsModule} from "@angular/material/chips";
-import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {MatChipsModule} from "@angular/material/chips";
 import {MatIconModule} from "@angular/material/icon";
 import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
 import {MatListModule} from "@angular/material/list";
 import {NgIf, NgOptimizedImage} from "@angular/common";
 import {MatInputModule} from "@angular/material/input";
-import {MatRippleModule} from "@angular/material/core";
+import {MatOption, MatRippleModule} from "@angular/material/core";
 import {MatButtonModule} from "@angular/material/button";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatDialog} from "@angular/material/dialog";
@@ -20,13 +19,21 @@ import {UserDeleteDialog} from "../user-delete-dialog/user-delete-dialog";
 import {MatCardModule} from "@angular/material/card";
 import {UserStatusComponentComponent} from "../user-status-component/user-status-component.component";
 import {MatProgressBar} from "@angular/material/progress-bar";
+import {getDate} from "../../utils/utils";
+import {MatTooltip} from "@angular/material/tooltip";
+import {MatSelect} from "@angular/material/select";
 
+/**
+ * UserListComponent is a component that displays a list of users in a table.
+ * The table includes columns for the user's id, name, names, email, createdAt, updatedAt, status, and actions.
+ * The actions column includes buttons for deleting a user.
+ * The component includes a paginator and a sort header for navigating and sorting the table.
+ */
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css'],
   imports: [
-    MatProgressSpinnerModule,
     MatIconModule,
     MatChipsModule,
     RouterLink,
@@ -44,6 +51,9 @@ import {MatProgressBar} from "@angular/material/progress-bar";
     MatProgressBar,
     RouterLinkActive,
     RouterOutlet,
+    MatTooltip,
+    MatSelect,
+    MatOption,
   ],
   standalone: true
 })
@@ -52,7 +62,7 @@ export class UserListComponent implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatTable) table!: MatTable<User>;
 
-  // flag to show/hide loading spinner
+  // flag to show/hide loading progress bar
   isLoadingResults = true;
   // data source for table
   dataSource = new MatTableDataSource<User>();
@@ -66,7 +76,7 @@ export class UserListComponent implements AfterViewInit {
     this.dataStream.subscribe((data) => {
       this.dataSource.data = data;
     });
-    // get users and delay results to simulate slow connection
+    // get users
     this.loadUsers()
     // bind sortData function to this
     this.sortData = this.sortData.bind(this);
@@ -112,8 +122,8 @@ export class UserListComponent implements AfterViewInit {
       data.email.toLowerCase().includes(filterLower) ||
       data.enabled.toString().toLowerCase().includes(filterLower) ||
       data.paymentCard?.toLowerCase().includes(filterLower) ||
-      this.getDate(data.createdAt!).toLowerCase().includes(filterLower) ||
-      this.getDate(data.updatedAt!).toLowerCase().includes(filterLower);
+      getDate(data.createdAt!).toLowerCase().includes(filterLower) ||
+      getDate(data.updatedAt!).toLowerCase().includes(filterLower);
   }
 
   /** Simple sort comparator for example ID/Name columns (for client-side sorting). */
@@ -205,7 +215,6 @@ export class UserListComponent implements AfterViewInit {
    * Loads users from the server.
    * If enable is not specified, all users are loaded.
    * If enable is specified, only users with the specified enabled value are loaded.
-   * By default, the loading spinner is shown and a delay of 1 second is simulated.
    *
    * @param {boolean} [enable] - Optional parameter to specify if only enabled users should be loaded.
    * @return {void} - Nothing.
@@ -217,10 +226,8 @@ export class UserListComponent implements AfterViewInit {
     this.userService.getUsers(enable).subscribe(
       {
         next: (users) => {
-          setTimeout(() => {
-            this.dataStream.next(users);
-            this.isLoadingResults = false;
-          }, 1000);
+          this.dataStream.next(users);
+          this.isLoadingResults = false;
         },
         error: (err) => {
           console.error(err);
@@ -237,26 +244,6 @@ export class UserListComponent implements AfterViewInit {
   }
 
   /**
-   * Handles the chip selection change event.
-   *
-   * @param {MatChipSelectionChange} $event - The chip selection change event object.
-   * @return {void} - Nothing.
-   */
-  onChipSelectionChanged($event: MatChipSelectionChange): void {
-    if (!$event.selected) {
-      // Calls api service to get all users by default
-      this.loadUsers();
-    } else {
-      // Calls api service to get filtered users because the professor said so
-      if ($event.source.value === "Activos") {
-        this.loadUsers(true);
-      } else if ($event.source.value === "Inactivos") {
-        this.loadUsers(false);
-      }
-    }
-  }
-
-  /**
    * Applies a filter to the data source based on the value of a search input.
    *
    * @param filterValue The value of the search input.
@@ -269,13 +256,27 @@ export class UserListComponent implements AfterViewInit {
     }
   }
 
+  protected readonly getDate = getDate;
+
   /**
-   * Returns a formatted date.
-   * @param isoDate The date in ISO 8601 format.
+   * Filters the users based on their status.
+   *
+   * This method is used to filter the users based on their status. It accepts a string value which can be 'all', 'active', or 'inactive'.
+   * If the value is 'all', it loads all users.
+   * If the value is 'active', it loads only the users who are active.
+   * If the value is 'inactive', it loads only the users who are inactive.
+   *
+   * @param {string} value - The status of the users to load. Can be 'all', 'active', or 'inactive'.
    */
-  protected getDate(isoDate: string) {
-    // createdAt is a string in format ISO 8601
-    return new Date(isoDate).toLocaleString('es-ES', {hour12: false});
+  applyFilterByStatus(value: string) {
+    console.log("Filtering by status: " + value);
+    if (value == "all") {
+      this.loadUsers();
+    } else if (value == "enabled") {
+      this.loadUsers(true);
+    } else if (value == "disabled") {
+      this.loadUsers(false);
+    }
   }
 
 }

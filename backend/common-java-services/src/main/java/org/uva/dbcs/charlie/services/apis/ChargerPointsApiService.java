@@ -23,9 +23,10 @@ public class ChargerPointsApiService extends BaseApiService implements ChargerPo
 
   @Override
   public List<ChargePoint> getCompatibleChargerPoints(List<VehiclePlugType> plugTypes) {
+    String plugTypesString = plugTypes.stream().map(Enum::name).reduce((a, b) -> a + "," + b).orElse("");
     return webClient
             .get()
-            .uri(RESOURCE_PATH + "?plugType=" + plugTypes)
+            .uri(RESOURCE_PATH + "?plugType=" + plugTypesString)
             .retrieve()
             .bodyToFlux(ChargePoint.class)
             .collectList()

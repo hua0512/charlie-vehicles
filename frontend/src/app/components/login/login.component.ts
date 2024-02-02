@@ -1,12 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {MatCard, MatCardModule} from "@angular/material/card";
+import {MatCardModule} from "@angular/material/card";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {NgIf} from "@angular/common";
 import {MatError, MatFormField, MatHint, MatInput, MatLabel, MatSuffix} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
-import {UserService} from "../../services/UserService";
 import {Router} from "@angular/router";
 import {AuthService} from "../../services/AuthService";
 import {MatSnackBar} from "@angular/material/snack-bar";

@@ -1,0 +1,81 @@
+<div class="outer-container">
+  <mat-card class="info_card">
+    <mat-card-header>
+      <mat-card-title>
+        <h2>Información de la recarga</h2>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="info-outer-container">
+        <div class="info_container">
+          <mat-label>Id:</mat-label>
+          <p>{{ recharge?.id }}</p>
+
+          <mat-label>N.Vehículo:</mat-label>
+          <p>{{ recharge?.vehicleId }}</p>
+
+
+          <mat-label>N.punto de carga:</mat-label>
+          <p>{{ recharge?.chargerpointId }}</p>
+
+
+          <mat-label>Precio de recarga kWh:</mat-label>
+          <p>{{ recharge?.price }} €</p>
+
+          <div *ngIf="shouldShow">
+            <mat-label>Potencia total cargada (kW):</mat-label>
+            <p>{{ recharge?.kw }}</p>
+
+          </div>
+
+          <div *ngIf="shouldShow">
+            <mat-label>Precio total de la recarga:</mat-label>
+            <p>{{ calcTotal() }}</p>
+          </div>
+
+          <mat-label>Estado de la recarga:</mat-label>
+          <p>{{ recharge?.status }}</p>
+
+          <mat-label>Estado de pago:</mat-label>
+          <p>{{ recharge?.payment }}</p>
+
+          <mat-label>Fecha de inicio:</mat-label>
+          <p>{{ recharge?.dateStart ? getDate(recharge?.dateStart) : "Sin comenzar" }}</p>
+
+          <div *ngIf="shouldShow">
+            <mat-label>Fecha de fin:</mat-label>
+            <p>{{ getDate(recharge?.dateEnd) }}</p>
+          </div>
+        </div>
+        <div class="maps-container" *ngIf="chargerpoint">
+          <google-map [center]="{lat: chargerpoint.latitude, lng: chargerpoint.longitude}" [zoom]="5" #map>
+            <map-marker [position]="{lat: chargerpoint.latitude!, lng: chargerpoint.longitude}"
+                        (mapClick)="openInfoWindow(chargerpoint.id)">
+            </map-marker>
+            <map-info-window #infoWindow>
+              <p>{{ chargerpoint.address }}</p>
+              <strong>Power: </strong>{{ chargerpoint.power }}<br>
+            </map-info-window>
+          </google-map>
+        </div>
+
+      </div>
+
+
+    </mat-card-content>
+    <mat-card-footer>
+      <br>
+      <div class="button_container">
+        <button mat-raised-button color="primary" (click)="finishRecharge()" *ngIf="shouldShowSubmit()">Terminar
+          recarga
+        </button>
+        <button mat-raised-button color="warn" routerLink="../">Volver</button>
+      </div>
+      <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+    </mat-card-footer>
+  </mat-card>
+
+
+</div>
+

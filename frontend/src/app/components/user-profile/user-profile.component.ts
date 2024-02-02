@@ -10,9 +10,11 @@ import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {DatePipe, NgIf} from "@angular/common";
-import {MatCard, MatCardContent, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
+import {MatCard, MatCardContent, MatCardFooter, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
 import {UserStatusComponentComponent} from "../user-status-component/user-status-component.component";
-import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {MatProgressBar} from "@angular/material/progress-bar";
+import {getDate} from "../../utils/utils";
+import {debounceTime, of, switchMap} from "rxjs";
 
 @Component({
   selector: 'app-user-edit',
@@ -33,7 +35,8 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
     MatCardSubtitle,
     MatCardTitle,
     UserStatusComponentComponent,
-    MatProgressSpinner,
+    MatCardFooter,
+    MatProgressBar,
   ],
   standalone: true
 })
@@ -72,15 +75,58 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
       firstName: [this.user.firstName, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
       lastName:
         [this.user.lastName, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
-      password:
-        ["", [Validators.required, Validators.minLength(6), Validators.maxLength(20)]],
+      password: ["",],
       email:
         [this.user.email, [Validators.required, Validators.email, Validators.maxLength(30)]],
       // add a validator to check paymentcard format
       paymentCard: [this.user.paymentCard, [Validators.maxLength(16), Validators.minLength(16), Validators.pattern("^[0-9]*$")]],
-      createdAt: [this.getDate(this.user.createdAt)],
-      updatedAt: [this.getDate(this.user.updatedAt)]
+      createdAt: [getDate(this.user.createdAt)],
+      updatedAt: [getDate(this.user.updatedAt)]
     })
+
+    let passwordControl = this.myForm.get('password');
+    this.myForm.get('password')?.valueChanges.subscribe({
+      next: (value) => {
+        if (value != null && value != "") {
+          passwordControl?.setValidators([Validators.required, Validators.maxLength(20), Validators.minLength(6)]);
+        } else {
+          passwordControl!.clearValidators();
+          passwordControl!.setErrors(null);
+        }
+      }
+    })
+
+    let emailControl = this.myForm.get('email');
+    // listen to email changes, call backend to check if email is valid and not in use. DebounceTime 500ms
+    emailControl?.valueChanges.pipe(
+      debounceTime(500),
+      switchMap(email => {
+        if (email == null || email == "") {
+          return of(null);
+        }
+        if (email) {
+          return this.userService.getUserByEmail(email);
+        } else {
+          return of(null);
+        }
+      })
+    ).subscribe(response => {
+      if (response && response.length > 0) {
+        console.log("Email taken: " + response);
+        emailControl!.setErrors({'emailTaken': true});
+      } else {
+        console.log("Email not taken: " + response);
+        // preserver others errors if any (like required) and remove emailTaken error
+        let errors = emailControl!.errors;
+        if (errors) {
+          delete errors['emailTaken'];
+          if (Object.keys(errors).length == 0) {
+            errors = null;
+          }
+        }
+      }
+    });
+
   }
 
   ngOnInit() {
@@ -103,10 +149,6 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
             this.user = user;
             console.log("User: " + JSON.stringify(this.user));
             this._initForm();
-            // password is not required to change
-            this.myForm.get('password')?.removeValidators(Validators.required);
-            this.myForm.get('password')?.removeValidators(Validators.minLength(6));
-            this.myForm.get('password')?.updateValueAndValidity();
             this.loading = false;
           },
           error: (err) => console.log("Error: " + err)
@@ -126,6 +168,10 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
         createdAt: '',
         updatedAt: ''
       };
+
+      // change password validator
+      let passwordControl = this.myForm.get('password');
+      passwordControl?.setValidators([Validators.required, Validators.maxLength(20), Validators.minLength(6)]);
     }
   }
 
@@ -211,18 +257,6 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
     } else {
       this._snackBar.open("No se ha modificado ningún campo", "Cerrar", {duration: 3000});
     }
-  }
-
-  /**
-   * Returns a formatted date.
-   * @param isoDate The date in ISO 8601 format.
-   */
-  protected getDate(isoDate: string | undefined) {
-    if (!isoDate) {
-      return '';
-    }
-    // createdAt is a string in format ISO 8601
-    return new Date(isoDate).toLocaleString('es-ES', {hour12: false});
   }
 
   getHintLabel(number: number) {

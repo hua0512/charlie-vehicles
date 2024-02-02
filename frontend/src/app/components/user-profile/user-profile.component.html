@@ -3,9 +3,6 @@
     <mat-card-title>
       <h2>Detalles del usuario</h2>
     </mat-card-title>
-    <mat-card-subtitle>
-      <mat-spinner *ngIf="loading"></mat-spinner>
-    </mat-card-subtitle>
     <mat-card-content>
       <div class="left-container">
         <form ngForm [formGroup]="myForm" (ngSubmit)="onSubmit()">
@@ -47,12 +44,14 @@
                    placeholder="pet@example.com">
             <mat-hint align="end">{{ email.value.length }}/30</mat-hint>
             <mat-error *ngIf="myForm.invalid">Se debe introducir un email válido</mat-error>
+            <mat-error *ngIf="myForm.get('email')?.hasError('emailTaken')">Este correo ya esta registrado</mat-error>
           </mat-form-field>
           <br>
-          <mat-form-field appearance="outline" hintLabel="Tu contraseña está guardada de forma segura (solo lo sabes tu)">
-            <mat-label>{{getPasswordLabel()}}</mat-label>
+          <mat-form-field appearance="outline"
+                          hintLabel="Tu contraseña está guardada de forma segura (solo lo sabes tu)">
+            <mat-label>{{ getPasswordLabel() }}</mat-label>
             <input matInput [type]="hide ? 'password' : 'text'" maxlength="20" formControlName="password" #password
-                   placeholder="Escribir nueva contraseña">
+                   placeholder="Escribir nueva contraseña" >
             <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
                     [attr.aria-pressed]="hide">
               <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
@@ -104,6 +103,9 @@
       </div>
 
     </mat-card-content>
+    <mat-card-footer>
+      <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+    </mat-card-footer>
   </mat-card>
 
 </div>

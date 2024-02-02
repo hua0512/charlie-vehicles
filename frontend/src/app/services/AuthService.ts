@@ -17,7 +17,7 @@ export class AuthService extends BaseService {
   }
 
   login(email: string, password: string): Observable<{ expires_at: string, token: string }> {
-    return this.http.post<{ expires_at: string, token: string }>(`${environment.loginApiUrl}/login`, {email, password}).pipe(
+    return this.http.post<{ expires_at: string, token: string }>(`${environment.loginApiUrl}`, {email, password}).pipe(
       tap(response => {
         localStorage.setItem('token', response.token);
         // timestamp when the token will expire

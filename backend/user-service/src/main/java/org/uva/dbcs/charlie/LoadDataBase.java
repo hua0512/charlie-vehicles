@@ -24,10 +24,10 @@ public class LoadDataBase {
       if (repository.count() > 0) {
         return;
       }
-      User user = new User("oaguilar", "Oscar", "Aguilar", "oaguilar@gmail.com", "$2b$10$1Q3Th6eYM9fdXqDay.vKo.QersoQGZniQoeYf0n5mu6VH9f4tt.0a", "81238391832313231");
+      User user = new User("oaguilar", "Oscar", "Aguilar", "oaguilar@gmail.com", "$2b$10$1Q3Th6eYM9fdXqDay.vKo.QersoQGZniQoeYf0n5mu6VH9f4tt.0a", "8123839183213231");
       user.setEnabled(true);
       log.info("Preloading " + repository.save(user));
-      user = new User("jdoe", "John", "Doe", "jdoe@gmail.com", "$2b$10$1Q3Th6eYM9fdXqDay.vKo.QersoQGZniQoeYf0n5mu6VH9f4tt.0a", "81238391832313232");
+      user = new User("jdoe", "John", "Doe", "jdoe@gmail.com", "$2b$10$1Q3Th6eYM9fdXqDay.vKo.QersoQGZniQoeYf0n5mu6VH9f4tt.0a", "8123839183213232");
       user.setEnabled(true);
       log.info("Preloading " + repository.save(user));
 

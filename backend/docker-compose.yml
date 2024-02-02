@@ -1,15 +1,101 @@
 version: '3.9'
 
 volumes:
+  kong_data: { }
   users_data: { }
   vehicles_data: { }
   chargerpoints_data: { }
+  recharges_data: { }
 
 networks: #Red interna para comunicar los servicios (“Services on the same network can communicate with each other using their name”)
   kong-net:
   users-net:
 
 services:
+  kong-database:
+    image: postgres:9.6
+    container_name: kong-postgres
+    restart: on-failure
+    ports:
+      - "5432:5432"
+    networks:
+      - kong-net
+    volumes:
+      - kong_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: ${KONG_PG_PASSWORD:-kong}
+      POSTGRES_DB: kong
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "kong" ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  kong-migration:
+    image: ${KONG_DOCKER_TAG:-kong:latest}
+    command: kong migrations bootstrap
+    networks:
+      - kong-net
+    restart: on-failure
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_DATABASE: kong
+      KONG_PG_HOST: kong-database
+      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD:-kong}
+      KONG_PG_USER: kong
+    depends_on:
+      kong-database:
+        condition: service_healthy
+  kong:
+    image: ${KONG_DOCKER_TAG:-kong:latest}
+    restart: on-failure
+    networks:
+      - kong-net
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD:-kong}
+      KOING_PROXY_LISTEN: 0.0.0.0:8000,
+      KONG_PROXY_LISTEN_SSL: 0.0.0.0:8443
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "kong", "health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8443:8443"
+      - "8444:8444"
+  konga-prepare:
+    image: pantsel/konga:latest
+    command: "-c prepare -a postgres -u postgresqpl://kong:${KONG_PG_PASSWORD:-kong}@kong-database:5432/konga"
+    networks:
+      - kong-net
+    restart: on-failure
+    depends_on:
+      kong-database:
+        condition: service_healthy
+  konga:
+    image: pantsel/konga:latest
+    restart: always
+    networks:
+      - kong-net
+    environment:
+      DB_ADAPTER: postgres
+      DB_URI: postgresqpl://kong:${KONG_PG_PASSWORD:-kong}@kong-database:5432/konga
+      NODE_ENV: production
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    ports:
+      - "8092:1337"
   auth-api:
     image: auth-api-image
     build:
@@ -21,10 +107,10 @@ services:
     networks:
       - kong-net
     environment:
-      KEY_ID: "charlie"
-      SECRET: "QWIKEJQKWJEKQWJKQJEWKEQJWK"
+      KEY_ID: fBdjldKzV3GPjI5sAC7pggruybNkSMMu
+      SECRET: QWIKEJQKWJEKQWJKQJEWKEQJWK
       PORT: 8081
-      USER_API_URL: "http://users-api:8080/users"
+      USER_API_URL: http://users-api:8080/users
     depends_on:
       - users-api
   users-api:
@@ -42,10 +128,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://users-database:3306/charlie-users?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: charlie
       SPRING_DATASOURCE_PASSWORD: charlie
-      USER_API_URL: "http://users-api:8080"
-      VEHICLES_API_URL: "http://vehicles-api:8080"
-      CHARGERPOINTS_API_URL: "http://chargerpoints-api:8080"
-      PUBLIC_KEY: "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAljzY8N1WcQNGRhR2uMl0 i5Bda/uwokjQQ2z89HyMfwXwZyoNumleC9dCLIKzW73dYngZY+KaUorrXH4i/Cyj ONKWedjOjp/jKHqosW3u5IHSVWc1ww5XTSplBjg7o9ztFrjZCy+ceIvZlaKSVt0s 9x0WTCV3ZwOrEB/rez3SHSHvCJAr3RsYDoymGFoaKQ52oatOjNo+YtXCfc2Iuedf daLD2FiGX9t6of/UtLyPDBVfMAOHI70VXXmKzUNIktIW35V9e6YRZOd25p0ODttJ kZTr31v8VXk251tSLnF3DGTaYc3Z2eDHPp5yhnoqapIj35468oBhC2qrYM5HZ1gJ SQwyldpDyKxMEJHyeEy4vLbVt68iChilY8diHbc9W6HLdXLbdfe7DwRPzcjlYb4j GATx6AX8HzXhS/XZcekMVs7xew59ucWxTflK34grEhnkO67abPDShNooPUusQkwW lr1z9SLSz9OrvhCCrwzthAG50OU/T9QwN265bZDObQ4Ei641RUrQOl5nFee2EuYC 7vGdSbdm+lXkSzWwqvWH9kRzZldp68vwtPixmyj+N1LQ1USTAD629RpnG68RDOLl h2xmwQ0IF3eLi/Re72IZPhSE8waYSEYrU9KT3xPk9jzpjiSN96mYV27j6d5/ACrt +xD+3jKSjfubGZ16z7fKwt0CAwEAAQ=="
+      USER_API_URL: http://users-api:8080
+      VEHICLES_API_URL: http://vehicles-api:8080
+      CHARGERPOINTS_API_URL: http://chargerpoints-api:8080
     depends_on:
       users-database:
         condition: service_healthy
@@ -63,10 +148,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://vehicles-database:3306/charlie-vehicles?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: charlie
       SPRING_DATASOURCE_PASSWORD: charlie
-      USER_API_URL: "http://users-api:8080"
-      VEHICLES_API_URL: "http://vehicles-api:8080"
-      CHARGERPOINTS_API_URL: "http://chargerpoints-api:8080"
-      PUBLIC_KEY: "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAljzY8N1WcQNGRhR2uMl0 i5Bda/uwokjQQ2z89HyMfwXwZyoNumleC9dCLIKzW73dYngZY+KaUorrXH4i/Cyj ONKWedjOjp/jKHqosW3u5IHSVWc1ww5XTSplBjg7o9ztFrjZCy+ceIvZlaKSVt0s 9x0WTCV3ZwOrEB/rez3SHSHvCJAr3RsYDoymGFoaKQ52oatOjNo+YtXCfc2Iuedf daLD2FiGX9t6of/UtLyPDBVfMAOHI70VXXmKzUNIktIW35V9e6YRZOd25p0ODttJ kZTr31v8VXk251tSLnF3DGTaYc3Z2eDHPp5yhnoqapIj35468oBhC2qrYM5HZ1gJ SQwyldpDyKxMEJHyeEy4vLbVt68iChilY8diHbc9W6HLdXLbdfe7DwRPzcjlYb4j GATx6AX8HzXhS/XZcekMVs7xew59ucWxTflK34grEhnkO67abPDShNooPUusQkwW lr1z9SLSz9OrvhCCrwzthAG50OU/T9QwN265bZDObQ4Ei641RUrQOl5nFee2EuYC 7vGdSbdm+lXkSzWwqvWH9kRzZldp68vwtPixmyj+N1LQ1USTAD629RpnG68RDOLl h2xmwQ0IF3eLi/Re72IZPhSE8waYSEYrU9KT3xPk9jzpjiSN96mYV27j6d5/ACrt +xD+3jKSjfubGZ16z7fKwt0CAwEAAQ=="
+      USER_API_URL: http://users-api:8080
+      VEHICLES_API_URL: http://vehicles-api:8080
+      CHARGERPOINTS_API_URL: http://chargerpoints-api:8080
     depends_on:
       vehicles-database:
         condition: service_healthy
@@ -84,10 +168,31 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://chargerpoints-database:3306/charlie-points?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: charlie
       SPRING_DATASOURCE_PASSWORD: charlie
-      USER_API_URL: "http://users-api:8080"
-      VEHICLES_API_URL: "http://vehicles-api:8080"
-      CHARGERPOINTS_API_URL: "http://chargerpoints-api:8080"
-      PUBLIC_KEY: "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAljzY8N1WcQNGRhR2uMl0 i5Bda/uwokjQQ2z89HyMfwXwZyoNumleC9dCLIKzW73dYngZY+KaUorrXH4i/Cyj ONKWedjOjp/jKHqosW3u5IHSVWc1ww5XTSplBjg7o9ztFrjZCy+ceIvZlaKSVt0s 9x0WTCV3ZwOrEB/rez3SHSHvCJAr3RsYDoymGFoaKQ52oatOjNo+YtXCfc2Iuedf daLD2FiGX9t6of/UtLyPDBVfMAOHI70VXXmKzUNIktIW35V9e6YRZOd25p0ODttJ kZTr31v8VXk251tSLnF3DGTaYc3Z2eDHPp5yhnoqapIj35468oBhC2qrYM5HZ1gJ SQwyldpDyKxMEJHyeEy4vLbVt68iChilY8diHbc9W6HLdXLbdfe7DwRPzcjlYb4j GATx6AX8HzXhS/XZcekMVs7xew59ucWxTflK34grEhnkO67abPDShNooPUusQkwW lr1z9SLSz9OrvhCCrwzthAG50OU/T9QwN265bZDObQ4Ei641RUrQOl5nFee2EuYC 7vGdSbdm+lXkSzWwqvWH9kRzZldp68vwtPixmyj+N1LQ1USTAD629RpnG68RDOLl h2xmwQ0IF3eLi/Re72IZPhSE8waYSEYrU9KT3xPk9jzpjiSN96mYV27j6d5/ACrt +xD+3jKSjfubGZ16z7fKwt0CAwEAAQ=="
+    depends_on:
+      chargerpoints-database:
+        condition: service_healthy
+  recharges-api:
+    image: recharges-api-image
+    build:
+      context: ./recharges-service
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8090:3000"
+    networks:
+      - kong-net
+    environment:
+      USER_API_URL: http://users-api:8080/users
+      VEHICLES_API_URL: http://vehicles-api:8080/vehicles
+      CHARGERPOINTS_API_URL: http://chargerpoints-api:8080/chargerpoints
+      LENTA_PRICE: "0.13"
+      MEDIA_PRICE: "0.20"
+      RAPIDA_PRICE: "0.35"
+      ULTRARAPIDA_PRICE: "0.50"
+      db: "recharges-database"
+      db_user: "charlie"
+      db_password: "charlie"
+      db_schema: "charlie_recharges"
     depends_on:
       chargerpoints-database:
         condition: service_healthy
@@ -98,14 +203,14 @@ services:
       dockerfile: ../frontend/Dockerfile
     restart: unless-stopped
     ports:
-      - "8091:80"
+      - "4200:80"
     networks:
       - kong-net
-    environment:
-      VEHICLES_API_URL: "http://vehicles-api:8080"
-      LOGIN_API_URL: "http://auth-api:8081"
-      CHARGERPOINTS_API_URL: "http://chargerpoints-api:8080"
-      USER_API_URL: "http://users-api:8080"
+  #    environment:
+  #      USER_API_URL: "http://localhost:8000/api/users"
+  #      VEHICLES_API_URL: "http://localhost:8000/api/vehicles"
+  #      CHARGERPOINTS_API_URL: "http://localhost:8000/api/chargerpoints"
+  #      LOGIN_API_URL: "http://localhost:8080/api/auth"
   users-database:
     image: mysql #Usamos imagen del respositorio ya creada
     hostname: users-database
@@ -168,6 +273,29 @@ services:
       MYSQL_ROOT_PASSWORD: charlie-data-admin
       MYSQL_PASSWORD: charlie
       MYSQL_DATABASE: charlie-points
+      MYSQL_USER: charlie
+      MYSQL_ROOT_HOST: '%'
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  recharges-database:
+    image: mysql
+    hostname: recharges-database
+    cap_add:
+      - SYS_NICE
+    restart: always
+    ports:
+      - "3336:3306"
+    networks:
+      - kong-net
+    volumes:
+      - recharges_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: charlie-data-admin
+      MYSQL_PASSWORD: charlie
+      MYSQL_DATABASE: charlie_recharges
       MYSQL_USER: charlie
       MYSQL_ROOT_HOST: '%'
     healthcheck:

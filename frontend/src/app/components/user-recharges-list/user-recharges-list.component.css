@@ -1,0 +1,60 @@
+mat-card {
+  margin: 20px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  display: block;
+  position: relative;
+  word-wrap: break-word;
+}
+
+mat-paginator {
+  padding-bottom: 70px;
+}
+
+.fab-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2;
+}
+
+/*search section*/
+.table-search-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+
+.search-bar {
+  display: flex;
+  width: 50%;
+  align-items: center;
+  padding: 0 20px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px 20px;
+  border: none;
+}
+
+.search-bar input::placeholder {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.search-bar input:focus {
+  border: none;
+  outline: none;
+}
+
+.search-bar mat-icon {
+  position: relative;
+  color: rgba(0, 0, 0, 0.6);
+}

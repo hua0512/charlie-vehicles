@@ -20,10 +20,10 @@ import java.util.Map;
  *
  * @author weiweng
  */
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/chargerpoints")
-@CrossOrigin(origins = "*")
-class ChargePointController extends BaseController<ChargePointRepository> {
+public class ChargePointController extends BaseController<ChargePointRepository> {
 
   /**
    * Represents a controller for managing charge points.

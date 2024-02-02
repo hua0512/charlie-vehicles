@@ -36,7 +36,7 @@ export class AppComponent implements OnDestroy {
       console.log(this.pageTitle);
       if (url === 'login') {
         this.isLogged = false;
-      }else{
+      } else {
         this.isLogged = this.authService.isLoggedin();
       }
     });
@@ -50,12 +50,18 @@ export class AppComponent implements OnDestroy {
       return 'Perfil del Usuario';
     } else if (route.startsWith("/users") && route.endsWith("vehicles/new")) {
       return 'Nuevo Vehículo';
+    } else if (route.startsWith("/users") && route.endsWith("vehicles")) {
+      return 'Vehículos del Usuario'
+    } else if (route.startsWith("/users") && route.endsWith("recharges")) {
+      return 'Recargas del Usuario'
+    } else if (route.startsWith("/users") && route.endsWith("recharges/new")) {
+      return 'Nueva Recarga'
     } else if (route === '/users/new') {
       return 'Nuevo Usuario';
     } else if (route === '/vehicles') {
       return 'Mis vehículos';
     } else if (route === '/chargerpoints') {
-      return 'Puntos de carga';
+      return 'Gestión de puntos de carga';
     } else if (route === '/chargerpoints/new') {
       return 'Nuevo Punto de Carga';
     } else {
