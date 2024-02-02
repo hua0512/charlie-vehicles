@@ -116,7 +116,7 @@ services:
   users-api:
     image: users-api-image
     build:
-      context: .
+      context: ./user-service
       dockerfile: ./user-service/Dockerfile
     restart: unless-stopped
     ports:
@@ -137,7 +137,7 @@ services:
   vehicles-api:
     image: vehicles-api-image
     build:
-      context: .
+      context: ./vehicles-service
       dockerfile: ./vehicles-service/Dockerfile
     restart: unless-stopped
     ports:
@@ -157,7 +157,7 @@ services:
   chargerpoints-api:
     image: chargerpoints-api-image
     build:
-      context: .
+      context: ./chargerpoints-service
       dockerfile: ./chargerpoints-service/Dockerfile
     restart: unless-stopped
     ports:
