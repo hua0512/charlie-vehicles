@@ -42,6 +42,7 @@ export class AuthService extends BaseService {
   }
 
   logout() {
+    this.isLogged = false;
     localStorage.removeItem("token");
     localStorage.removeItem("expires_at");
   }
