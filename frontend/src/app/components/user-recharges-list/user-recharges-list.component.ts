@@ -74,15 +74,15 @@ export class UserRechargesListComponent implements AfterViewInit {
   // data source for table
   dataSource = new MatTableDataSource<Recharge>();
   displayedColumns = ['id', 'vehicleId', 'chargerpointId', 'price', 'kw', 'status', 'payment', 'dateStart', 'dateEnd'];
-  protected rechargeStatues = Object.values(RechargeStatus).filter(value => typeof value === 'string');
-  protected paymentStatus = Object.values(RechargePayment).filter(value => typeof value === 'string');
+  protected rechargeStatues = Object.values(RechargeStatus);
+  protected paymentStatus = Object.values(RechargePayment);
   id: number = 0;
   showAllow: boolean = false;
   user: User | undefined;
   vehicles: number = 0
 
 
-  constructor(private service: RechargeService, private userService: UserService, private vehicleService: VehicleService, private ChargerpointService: ChargerPointService, private route: ActivatedRoute, private router: Router, private snackBar: MatSnackBar) {
+  constructor(private service: RechargeService, private userService: UserService, private vehicleService: VehicleService, private route: ActivatedRoute, private router: Router, private snackBar: MatSnackBar) {
     this.loadUserId()
     // load data
     this.loadData();
